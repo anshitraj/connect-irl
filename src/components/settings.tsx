@@ -69,7 +69,7 @@ export function Settings() {
                 {demo
                   ? "You’re exploring illustrative data."
                   : user
-                    ? `Signed in as ${user.email}`
+                    ? `Signed in as ${user.email || "your X account"}`
                     : "A private guest workspace, saved on this browser."}
               </p>
             </div>
