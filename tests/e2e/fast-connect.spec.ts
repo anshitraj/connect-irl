@@ -234,10 +234,13 @@ test("Google is the first sign-in action and alternate methods stay tucked away"
     page.getByRole("button", { name: "Continue with Google", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Continue with GitHub", exact: true }),
+    page.getByRole("button", { name: "Continue with X", exact: true }),
   ).not.toBeVisible();
   await page.getByText("Other ways to sign in", { exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Continue with GitHub", exact: true }),
+    page.getByRole("button", { name: "Continue with X", exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Continue with GitHub", exact: true }),
+  ).toHaveCount(0);
 });

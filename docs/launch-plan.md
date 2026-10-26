@@ -31,7 +31,7 @@ This app's existing Next.js route handlers run with the Vercel deployment. There
 ## Add only when needed
 
 - **Email reminders:** Resend is the chosen verification-mail provider. Scheduled follow-up email reminders would require additional scheduling/delivery work; they are not sent by the current in-app reminder feature. Google OAuth does not require a separate email-code step.
-- **GitHub OAuth:** configure a GitHub OAuth client only if enabling the alternate GitHub sign-in method. A GitHub profile URL does not require OAuth.
+- **X (Twitter) OAuth:** the alternate sign-in method. Create an X developer app with OAuth 2.0 user authentication (Web App, "Request email from users" on, callback `https://YOUR_PROJECT.supabase.co/auth/v1/callback`) and add its Client ID/secret to Supabase's X / Twitter (OAuth 2.0) provider. A profile link or photo lookup does not require this sign-in.
 - **Error monitoring:** start with Vercel/Supabase logs; add a service such as Sentry if needed. Keep private notes, tokens, and contact records out of logs.
 - **Scheduled email/push reminders or realtime presence:** separate future work. Current follow-ups are in-app, and venue discovery uses explicit refresh/expiry. Extra messaging, queue, and realtime services are not launch dependencies for the current behavior.
 

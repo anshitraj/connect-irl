@@ -45,7 +45,7 @@ npm start
 - Organizer logos for Devcon, India Blockchain Week, and Solana Summit across dashboard cards, the directory, event pages, landing examples, and map popups. Saved-event filtering, larger mobile text/touch targets, staggered card entrances, restrained hover/scan feedback, and dialog transitions respect reduced motion. Brand assets are self-hosted and cache after viewing.
 - Venue discovery on event pages and **Discover → At a venue**, with event, search, ecosystem, role, and collaboration-goal filters, pagination, manual refresh, automatic expiry, and contextual contact saving. Only active, public, discoverable profiles appear; blocks apply in both directions.
 - Follow-up creation, scheduling, completion/reopening, date changes, editable grounded message drafts, copying and external social links. No automatic messages are sent.
-- Actual Supabase SSR auth, magic-link/Google/GitHub code, protected APIs, transaction-based sync outbox, per-account local caches, RLS, input validation, database rate limits, safe upload validation, private audio storage, report/block controls, server-only deletion and moderation workflows.
+- Actual Supabase SSR auth, magic-link/Google/X code, protected APIs, transaction-based sync outbox, per-account local caches, RLS, input validation, database rate limits, safe upload validation, private audio storage, report/block controls, server-only deletion and moderation workflows.
 - Installable PWA manifest/icons, scoped service worker, cached data-free app shells/static assets, local offline saves, reconnection sync and explicit sync/error states. APIs and public-profile HTML are never cached by the service worker.
 
 ## Configure the shared backend
@@ -67,7 +67,7 @@ See [the Vercel + Supabase launch plan](docs/launch-plan.md) for the final servi
 
 4. In Supabase Auth, set the Site URL to `https://connectirl.xyz`. Add `http://localhost:3000/auth/callback` and `https://connectirl.xyz/auth/callback` to allowed redirect URLs. OAuth and email sign-in links use the PKCE callback; the backup email code is entered directly in the app.
 5. Enable Email sign-in. Configure Resend SMTP, six-digit OTPs, the supplied email template (in both the Magic Link and Confirm signup slots), and appropriate email/auth limits using [the Resend setup guide](docs/resend-setup.md).
-6. Enable Google and GitHub providers with credentials from their respective developer consoles. The OAuth callback registered **with each provider** is `https://YOUR_PROJECT.supabase.co/auth/v1/callback`. Supabase redirects back to this app's `/auth/callback` afterward.
+6. Enable the Google and **X / Twitter (OAuth 2.0)** providers with credentials from their respective developer consoles. For X, turn on "Request email from users" in the X app's user authentication settings. The OAuth callback registered **with each provider** is `https://YOUR_PROJECT.supabase.co/auth/v1/callback`. Supabase redirects back to this app's `/auth/callback` afterward.
 7. Restart the development server after changing environment variables. Rebuild when public environment variables change.
 8. Sign in, publish a profile, wait for **All changes synced**, then open its URL in a separate private browser to verify cross-device publication.
 9. To migrate existing guest records, explicitly choose **Settings → Import device records**. Guest data is not silently uploaded.

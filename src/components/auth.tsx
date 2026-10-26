@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Github } from "./icons";
+import { SocialLogo } from "./social-logo";
 import { Brand, Button, ButtonLink } from "./ui";
 export function Auth({ signup = false }: { signup?: boolean }) {
   const [email, setEmail] = useState("");
@@ -62,7 +62,7 @@ export function Auth({ signup = false }: { signup?: boolean }) {
       setBusy(false);
     }
   };
-  const oauth = async (provider: "google" | "github") => {
+  const oauth = async (provider: "google" | "x") => {
     if (!sb) return;
     sessionStorage.removeItem("buildermatch.demo");
     setBusy(true);
@@ -249,10 +249,10 @@ export function Auth({ signup = false }: { signup?: boolean }) {
                 <Button
                   variant="secondary"
                   disabled={busy || !cloudConfigured}
-                  onClick={() => void oauth("github")}
+                  onClick={() => void oauth("x")}
                 >
-                  <Github size={17} />
-                  Continue with GitHub
+                  <SocialLogo platform="X" size={16} />
+                  Continue with X
                 </Button>
                 <div className="auth-divider">
                   <span />
