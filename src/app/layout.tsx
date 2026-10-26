@@ -8,6 +8,8 @@ import "./connect.css";
 import "./social-motion.css";
 import "./connectirl.css";
 import "./onboarding.css";
+import "./onboarding-flow.css";
+import "./contact-cards.css";
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",

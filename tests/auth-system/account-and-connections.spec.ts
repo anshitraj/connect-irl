@@ -1,44 +1,25 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { mockScanHardware } from "../e2e/scan-helpers";
 import AxeBuilder from "@axe-core/playwright";
-async function enterEmail(page: Page, email: string) {
-  await page.goto("/login");
-  await page.getByText("Other ways to sign in", { exact: true }).click();
-  await page.getByLabel("Email address", { exact: true }).fill(email);
-  await page
-    .getByRole("button", { name: "Email me a sign-in link", exact: true })
-    .click();
-  await expect(
-    page.getByLabel("Verification code", { exact: true }),
-  ).toBeVisible();
-}
-async function verify(page: Page) {
-  await page.getByLabel("Verification code", { exact: true }).fill("123456");
-  await page
-    .getByRole("button", { name: "Verify & continue", exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/app(?:\/profile)?$/, { timeout: 30000 });
-}
+import { openLink, requestLink } from "./magic-link";
 test.beforeEach(async ({ request }) => {
   await request.post("http://127.0.0.1:4401/_test/reset");
 });
-test("email ownership is verified, invalid codes fail, and returning members enter the app", async ({
+test("email links sign members in, bad links fail, and returning members enter the app", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/);
-  await enterEmail(page, "priya@example.com");
+  await requestLink(page, "priya@example.com");
   await expect(
     page.getByRole("button", { name: /Resend email in/ }),
   ).toBeDisabled();
-  await page.getByLabel("Verification code", { exact: true }).fill("999999");
-  await page
-    .getByRole("button", { name: "Verify & continue", exact: true })
-    .click();
+  await page.goto("/auth/confirm?token_hash=not_a_valid_link_token");
+  await expect(page).toHaveURL(/\/login\?error=expired/);
   await expect(page.locator(".auth-form .form-error")).toContainText(
-    /expired|invalid/,
+    /sign-in link expired/,
   );
-  await verify(page);
+  await openLink(page, "priya@example.com");
   await expect(
     page.getByRole("heading", { name: /Good to see you, Priya/ }),
   ).toBeVisible();
@@ -47,18 +28,19 @@ test("email ownership is verified, invalid codes fail, and returning members ent
   await page.goto("/login");
   await expect(page).toHaveURL(/\/app$/);
 });
-test("a new verified email goes to three-step onboarding", async ({ page }) => {
-  await enterEmail(page, "new-builder@example.com");
-  await verify(page);
+test("a new verified email goes to five-step onboarding", async ({ page }) => {
+  await requestLink(page, "new-builder@example.com");
+  await openLink(page, "new-builder@example.com");
   await expect(page).toHaveURL(/\/app\/profile$/);
-  await expect(page.getByLabel("Onboarding step 1 of 3")).toBeVisible();
+  await expect(page.getByLabel("Onboarding step 1 of 5")).toBeVisible();
+  await expect(page.locator(".app-sidebar")).toHaveCount(0);
 });
 test("the other account receives a genuine synced connection and success animation while sharing QR", async ({
   browser,
   page,
 }) => {
-  await enterEmail(page, "priya@example.com");
-  await verify(page);
+  await requestLink(page, "priya@example.com");
+  await openLink(page, "priya@example.com");
   await expect(
     page.getByRole("heading", { name: /Good to see you, Priya/ }),
   ).toBeVisible();
@@ -72,8 +54,8 @@ test("the other account receives a genuine synced connection and success animati
   const other = await browser.newContext({ baseURL: "http://localhost:4400" });
   const scanner = await other.newPage();
   await mockScanHardware(scanner);
-  await enterEmail(scanner, "asha@example.com");
-  await verify(scanner);
+  await requestLink(scanner, "asha@example.com");
+  await openLink(scanner, "asha@example.com");
   await scanner.goto("/app/scan");
   await expect
     .poll(() => scanner.evaluate(() => window.__scanHarness.cameraCalls))

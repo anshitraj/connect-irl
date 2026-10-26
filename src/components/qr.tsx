@@ -1,7 +1,7 @@
 "use client";
-import { Copy, Download, Share2 } from "lucide-react";
+import { Copy, Download, LoaderCircle, Nfc, Share2 } from "lucide-react";
 import { profileQRImage } from "@/lib/profile-qr";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Button, Modal } from "./ui";
 import { useWorkspace } from "./workspace-provider";
 export function QR({
@@ -57,6 +57,56 @@ export function ShareQR({
     () => process.env.NEXT_PUBLIC_SITE_URL || "https://connectirl.xyz",
   );
   const url = `${origin}/u/${username}`;
+  // Browsers cannot make a phone act as an NFC tag, but Chrome on Android can
+  // write the profile link to a tag or card that anyone can then tap.
+  const nfcSupported = useSyncExternalStore(
+    subscribeOrigin,
+    () => "NDEFReader" in window,
+    () => false,
+  );
+  const [nfc, setNfc] = useState<"idle" | "waiting">("idle");
+  const nfcAbort = useRef<AbortController | null>(null);
+  const writeTag = async () => {
+    const Native = (
+      window as unknown as {
+        NDEFReader?: new () => {
+          write: (
+            message: { records: { recordType: string; data: string }[] },
+            options: { signal: AbortSignal; overwrite: boolean },
+          ) => Promise<void>;
+        };
+      }
+    ).NDEFReader;
+    if (!Native) return;
+    nfcAbort.current?.abort();
+    const controller = new AbortController();
+    nfcAbort.current = controller;
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 30000);
+    setNfc("waiting");
+    try {
+      await new Native().write(
+        { records: [{ recordType: "url", data: url }] },
+        { signal: controller.signal, overwrite: true },
+      );
+      toast("Saved to the tag. Anyone can now tap it to open your profile.");
+    } catch (err) {
+      if (timedOut) toast("No tag found. Hold it to the back of your phone.");
+      else if (!controller.signal.aborted)
+        toast(
+          err instanceof DOMException && err.name === "NotAllowedError"
+            ? "NFC permission is off. Allow it in your browser."
+            : "Couldn’t write to that tag. Try another one.",
+        );
+    } finally {
+      clearTimeout(timer);
+      if (nfcAbort.current === controller) nfcAbort.current = null;
+      setNfc("idle");
+    }
+  };
   useEffect(() => {
     void profileQRImage(url, 250).catch(() => {});
   }, [url]);
@@ -66,6 +116,7 @@ export function ShareQR({
       new CustomEvent("connectirl:qr-sharing", { detail: true }),
     );
     return () => {
+      nfcAbort.current?.abort();
       window.dispatchEvent(
         new CustomEvent("connectirl:qr-sharing", { detail: false }),
       );
@@ -141,6 +192,34 @@ export function ShareQR({
             Share
           </Button>
         </div>
+        {nfcSupported && (
+          <div className="share-nfc">
+            <span className="share-nfc-icon">
+              <Nfc size={20} />
+            </span>
+            <div>
+              <strong>Tap to share</strong>
+              <span>
+                Write your profile link to an NFC tag or card. Anyone who taps
+                it opens your profile.
+              </span>
+            </div>
+            <Button
+              variant="secondary"
+              disabled={nfc === "waiting"}
+              onClick={() => void writeTag()}
+            >
+              {nfc === "waiting" ? (
+                <>
+                  <LoaderCircle className="spin" size={15} />
+                  Hold a tag to your phone…
+                </>
+              ) : (
+                "Write to NFC tag"
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </Modal>
   );

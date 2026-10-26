@@ -110,6 +110,12 @@ beforeAll(async () => {
       "utf8",
     ),
   );
+  await db.exec(
+    await readFile(
+      resolve("supabase/migrations/202610260008_multi_event.sql"),
+      "utf8",
+    ),
+  );
   await db.exec(await readFile(resolve("supabase/seed.sql"), "utf8"));
   await db.exec(
     "grant select,insert,update,delete on all tables in schema public to authenticated; grant select on all tables in schema public to anon; grant select,insert,delete on storage.objects to authenticated; grant select on storage.objects to anon;",
@@ -130,6 +136,45 @@ afterAll(async () => {
   await db?.close();
 });
 describe("Real PostgreSQL migrations and ownership policies", () => {
+  it("stores every attended event privately and rejects unverified ones", async () => {
+    await asUser(alice);
+    await db.query("select public.sync_workspace($1::jsonb)", [
+      JSON.stringify(
+        batch({
+          activeEventId: "ibw-2026",
+          eventIds: ["ibw-2026", "ethglobal-2026", "devcon-8"],
+          preferencesChanged: true,
+        }),
+      ),
+    ]);
+    expect(
+      (
+        await db.query(
+          "select data->'eventIds' as ids from public.profile_preferences where owner_id=$1",
+          [alice],
+        )
+      ).rows,
+    ).toEqual([{ ids: ["ibw-2026", "ethglobal-2026", "devcon-8"] }]);
+    await expect(
+      db.query("select public.sync_workspace($1::jsonb)", [
+        JSON.stringify(
+          batch({
+            eventIds: ["ibw-2026", "invented-event"],
+            preferencesChanged: true,
+          }),
+        ),
+      ]),
+    ).rejects.toThrow(/verified event/);
+    await asUser(bob);
+    expect(
+      (
+        await db.query(
+          "select * from public.profile_preferences where owner_id=$1",
+          [alice],
+        )
+      ).rows,
+    ).toEqual([]);
+  });
   it("keeps the selected event private and rejects unverified event context atomically", async () => {
     await asUser(alice);
     await db.query("select public.sync_workspace($1::jsonb)", [
@@ -172,7 +217,7 @@ describe("Real PostgreSQL migrations and ownership policies", () => {
   });
   it("runs the complete schema and seed without SQL errors", async () => {
     const result = await db.query("select name from public.events");
-    expect(result.rows).toHaveLength(3);
+    expect(result.rows).toHaveLength(4);
   });
   it("rejects cross-account reads of contacts, meeting notes, and audio metadata", async () => {
     await asUser(bob);

@@ -24,12 +24,12 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ShareQR } from "./qr";
 import { ConnectionActivity } from "./connection-activity";
 import { Avatar, Brand, Button, ButtonLink } from "./ui";
-import { useWorkspace } from "./workspace-provider";
+import { useOnboardingState, useWorkspace } from "./workspace-provider";
 import { EventPicker } from "./event-picker";
 const navigation = [
   { href: "/app", label: "Home", icon: Home },
@@ -57,6 +57,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   } = useWorkspace();
   const [showQR, setShowQR] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const router = useRouter();
+  const onboarding = useOnboardingState();
+  // A signed-in account without a profile starts onboarding right away.
+  useEffect(() => {
+    if (onboarding === "needed" && user && !demo && path === "/app")
+      router.replace("/app/profile");
+  }, [onboarding, user, demo, path, router]);
   useEffect(() => {
     if (
       !("serviceWorker" in navigator) ||
@@ -98,6 +105,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const active = (href: string) =>
     href === "/app" ? path === href : path.startsWith(href);
   const pending = data.reminders.filter((r) => !r.completed).length;
+  // First-time setup is a focused flow without the workspace chrome.
+  if (path === "/app/profile" && onboarding !== "done")
+    return (
+      <main id="main" className="onboarding-focus">
+        {children}
+      </main>
+    );
   return (
     <div className="app-layout">
       <aside className={`app-sidebar ${mobileMenu ? "mobile-open" : ""}`}>

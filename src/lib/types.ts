@@ -89,6 +89,7 @@ export type Workspace = {
   eventBookmarks: string[];
   blocked: string[];
   activeEventId?: string;
+  eventIds?: string[];
 };
 export const emptyWorkspace: Workspace = {
   profile: null,
@@ -99,4 +100,5 @@ export const emptyWorkspace: Workspace = {
   eventBookmarks: [],
   blocked: [],
   activeEventId: "",
+  eventIds: [],
 };

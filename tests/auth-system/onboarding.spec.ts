@@ -1,21 +1,12 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { openLink, requestLink } from "./magic-link";
 test.beforeEach(async ({ request }) => {
   await request.post("http://127.0.0.1:4401/_test/reset");
 });
 async function begin(page: import("@playwright/test").Page) {
-  await page.goto("/login");
-  await page.getByText("Other ways to sign in", { exact: true }).click();
-  await page
-    .getByLabel("Email address", { exact: true })
-    .fill("new-profile@example.com");
-  await page
-    .getByRole("button", { name: "Email me a sign-in link", exact: true })
-    .click();
-  await page.getByLabel("Verification code", { exact: true }).fill("123456");
-  await page
-    .getByRole("button", { name: "Verify & continue", exact: true })
-    .click();
+  await requestLink(page, "new-profile@example.com");
+  await openLink(page, "new-profile@example.com");
   await expect(page).toHaveURL(/\/app\/profile$/, { timeout: 30000 });
 }
 test("multiple roles reveal only relevant details, photo previews auto-fill, and the finished profile persists", async ({
@@ -49,20 +40,24 @@ test("multiple roles reveal only relevant details, photo previews auto-fill, and
   await begin(page);
   await expect(page.getByLabel("Username", { exact: true })).toHaveCount(0);
   await page.getByLabel("Your name", { exact: true }).fill("Asha Builder");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page
     .getByRole("button", { name: "Crypto enthusiast", exact: true })
     .click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Skip for now", exact: true }).click();
   await expect(page.getByLabel("GitHub", { exact: true })).not.toBeVisible();
   await expect(page.getByLabel("Business name", { exact: true })).toHaveCount(
     0,
   );
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Engineer", exact: true }).click();
   await page.getByRole("button", { name: "Founder", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Crypto enthusiast", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await expect(page.getByLabel("GitHub", { exact: true })).toBeVisible();
   await page.getByLabel("X / Twitter", { exact: true }).fill("@new_founder");
@@ -158,8 +153,10 @@ test("photo lookup and image failures never block finishing with optional links 
   );
   await begin(page);
   await page.getByLabel("Your name", { exact: true }).fill("New Designer");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Designer", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Skip for now", exact: true }).click();
   await page.getByLabel("X / Twitter", { exact: true }).fill("new_designer");
   await expect(
     page.getByText(/You can continue without a photo/),
@@ -190,8 +187,10 @@ test("a late response for a previous X handle cannot replace the current photo",
   });
   await begin(page);
   await page.getByLabel("Your name", { exact: true }).fill("New Builder");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Builder", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Skip for now", exact: true }).click();
   const previousRequest = page.waitForRequest((request) => request.url().endsWith("/api/profile-lookup") && request.postDataJSON().handle === "previous_user");
   await page.getByLabel("X / Twitter", { exact: true }).fill("previous_user");
   await previousRequest;

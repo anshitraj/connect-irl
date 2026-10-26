@@ -5,6 +5,7 @@ Organizer sources checked 25 October 2026 (Asia/Kolkata):
 - Devcon 8 India, 3–6 November 2026, Jio World Centre: https://devcon.org/en/travel-guide/ and https://tickets.devcon.org/
 - India Blockchain Week, 1–2 November 2026, Fairmont Mumbai: https://indiablockchainweek.com/
 - Solana Summit India, 2 November 2026, JW Marriott Mumbai Sahar: https://www.solanasummit.in/
+- ETHGlobal Mumbai, 5–7 November 2026: dates and city from the organizer's event list at https://ethglobal.com/events (event page https://ethglobal.com/events/mumbai). The listing gives no venue; Jio World Convention Centre, BKC comes from a secondary calendar and must be confirmed against the organizer before the event. No organizer logo is shipped, so the app shows a text wordmark.
 - IBW Connect: https://connect.indiablockchainweek.com/ (external link; no private data access)
 - Devcon app: https://app.devcon.org/ (external link; no claimed integration)
 

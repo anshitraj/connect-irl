@@ -168,13 +168,18 @@ test("late camera permission after leaving the scanner is cleaned up", async ({
     .poll(() => page.evaluate(() => window.__scanHarness.stopped))
     .toBe(1);
 });
-test("three-step setup runs once, collects socials/event, exposes top My QR and remains editable", async ({
+test("five-step setup runs once, collects socials/event, exposes top My QR and remains editable", async ({
   page,
 }) => {
   await page.goto("/app/profile");
+  await expect(page.getByLabel("Onboarding step 1 of 5")).toBeVisible();
   await page.getByLabel("Your name", { exact: true }).fill("Test Builder");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Founder", exact: true }).click();
   await page.getByRole("button", { name: "Developer", exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Hiring", exact: true }).click();
+  await page.getByRole("button", { name: "Solana", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Business name", { exact: true }).fill("Test Rail");
   await page
@@ -194,6 +199,15 @@ test("three-step setup runs once, collects socials/event, exposes top My QR and 
       exact: true,
     }),
   ).toHaveAttribute("aria-pressed", "true");
+  // Several events can be selected at once; the earliest becomes the current event.
+  await page
+    .getByRole("button", { name: "Choose ETHGlobal Mumbai", exact: true })
+    .click();
+  for (const name of ["Choose India Blockchain Week", "Choose ETHGlobal Mumbai"])
+    await expect(page.getByRole("button", { name, exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   await page.getByRole("button", { name: "Finish setup", exact: true }).click();
   await expect(page).toHaveURL(/\/app$/);
   await page
@@ -243,4 +257,64 @@ test("Google is the first sign-in action and alternate methods stay tucked away"
   await expect(
     page.getByRole("button", { name: "Continue with GitHub", exact: true }),
   ).toHaveCount(0);
+});
+test("Share QR writes the profile link to an NFC tag so anyone can tap to open it", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "buildermatch.guest.v1",
+      JSON.stringify({
+        profile: {
+          id: "33333333-3333-4333-8333-333333333333",
+          username: "nfc-tester",
+          name: "NFC Tester",
+          headline: "",
+          bio: "",
+          role: "Builder",
+          roles: ["Builder"],
+          organization: "",
+          city: "",
+          avatar: "",
+          tags: [],
+          lookingFor: [],
+          project: "",
+          links: [],
+          public: true,
+          discoverable: false,
+        },
+        contacts: [],
+        projects: [],
+        reminders: [],
+        bookmarks: [],
+        eventBookmarks: [],
+        blocked: [],
+        activeEventId: "",
+      }),
+    );
+    const written: unknown[] = [];
+    Object.assign(window, { __nfcWrites: written });
+    Object.assign(window, {
+      NDEFReader: class {
+        async write(message: { records: unknown[] }) {
+          written.push(...message.records);
+        }
+      },
+    });
+  });
+  await page.goto("/app");
+  await page
+    .locator(".app-header")
+    .getByRole("button", { name: "My QR", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Write to NFC tag" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as unknown as { __nfcWrites: unknown[] }).__nfcWrites,
+      ),
+    )
+    .toEqual([
+      { recordType: "url", data: expect.stringMatching(/\/u\/nfc-tester$/) },
+    ]);
 });

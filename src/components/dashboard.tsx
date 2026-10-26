@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { ContactRow } from "./contact-tools";
+import { ContactCard } from "./contact-tools";
 import { ConnectLink } from "./connect-link";
 import { ShareQR } from "./qr";
 import { Button, ButtonLink, EmptyState } from "./ui";
@@ -133,9 +133,9 @@ export function Dashboard() {
             </Link>
           </div>
           {contacts.length ? (
-            <div className="contact-list">
+            <div className="contact-card-grid contact-card-grid-compact">
               {contacts.slice(0, 4).map((c) => (
-                <ContactRow contact={c} key={c.id} />
+                <ContactCard contact={c} key={c.id} />
               ))}
             </div>
           ) : (

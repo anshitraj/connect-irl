@@ -36,6 +36,12 @@
   justify-content: center;
   flex-shrink: 0;
 }
+.event-logo-wordmark {
+  font-weight: 750;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
 .event-logo img {
   display: block;
   width: 100%;

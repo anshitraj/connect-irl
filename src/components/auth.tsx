@@ -20,7 +20,6 @@ export function Auth({ signup = false }: { signup?: boolean }) {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [token, setToken] = useState("");
   const [remaining, setRemaining] = useState(0);
   const [sentAt, setSentAt] = useState(0);
   const router = useRouter();
@@ -35,6 +34,26 @@ export function Auth({ signup = false }: { signup?: boolean }) {
     const timer = window.setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [sentAt]);
+  useEffect(() => {
+    if (!sent || !sb) return;
+    const check = async () => {
+      if (document.visibilityState === "hidden") return;
+      const {
+        data: { user },
+      } = await sb.auth.getUser();
+      if (user) {
+        sessionStorage.removeItem("buildermatch.demo");
+        router.replace("/app");
+        router.refresh();
+      }
+    };
+    window.addEventListener("focus", check);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      window.removeEventListener("focus", check);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [sent, sb, router]);
   const sendCode = async () => {
     if (!sb || busy) return;
     setBusy(true);
@@ -49,14 +68,13 @@ export function Auth({ signup = false }: { signup?: boolean }) {
       });
       if (error) throw error;
       setSent(true);
-      setToken("");
       setSentAt(Date.now());
       setRemaining(60);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "We couldn’t send your code. Try again.",
+          : "We couldn’t send your link. Try again.",
       );
     } finally {
       setBusy(false);
@@ -126,7 +144,7 @@ export function Auth({ signup = false }: { signup?: boolean }) {
           </h2>
           <p>
             {sent
-              ? `We emailed a sign-in link to ${email.trim()}. Open it in this browser to sign in, or enter the 6-digit code from the same email.`
+              ? `We sent a sign-in link to ${email.trim()}. Tap it to sign in. It can take a minute to arrive.`
               : signup
                 ? "Continue with Google, then finish three quick profile steps."
                 : "Your people and possibilities are right where you left them."}
@@ -144,74 +162,10 @@ export function Auth({ signup = false }: { signup?: boolean }) {
               <span className="email-sent-icon">
                 <Mail size={36} />
               </span>
-              <form
-                className="form-stack email-code-form"
-                onSubmit={async (event) => {
-                  event.preventDefault();
-                  if (!sb || busy) return;
-                  setBusy(true);
-                  setError("");
-                  try {
-                    const { data, error } = await sb.auth.verifyOtp({
-                      email: email.trim(),
-                      token,
-                      type: "email",
-                    });
-                    if (error) throw error;
-                    if (!data.session || !data.user)
-                      throw new Error(
-                        "That code could not verify your email. Request a new one.",
-                      );
-                    sessionStorage.removeItem("buildermatch.demo");
-                    const { data: profile, error: profileError } = await sb
-                      .from("profiles")
-                      .select("id")
-                      .eq("id", data.user.id)
-                      .maybeSingle();
-                    router.replace(
-                      profile || profileError ? "/app" : "/app/profile",
-                    );
-                    router.refresh();
-                  } catch (err) {
-                    setError(
-                      err instanceof Error
-                        ? err.message
-                        : "That code has expired or is incorrect. Try again.",
-                    );
-                    setBusy(false);
-                  }
-                }}
-              >
-                <label>
-                  Verification code
-                  <input
-                    className="email-code-input"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    pattern="[0-9]{6}"
-                    minLength={6}
-                    maxLength={6}
-                    required
-                    value={token}
-                    onChange={(event) =>
-                      setToken(
-                        event.target.value.replace(/\D/g, "").slice(0, 6),
-                      )
-                    }
-                    placeholder="000000"
-                  />
-                </label>
-                <Button type="submit" disabled={busy || token.length !== 6}>
-                  {busy ? (
-                    <LoaderCircle className="spin" size={16} />
-                  ) : (
-                    <ShieldCheck size={16} />
-                  )}
-                  Verify & continue
-                </Button>
+              <div className="form-stack">
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="secondary"
                   disabled={busy || remaining > 0}
                   onClick={() => void sendCode()}
                 >
@@ -219,14 +173,13 @@ export function Auth({ signup = false }: { signup?: boolean }) {
                     ? `Resend email in ${remaining}s`
                     : "Resend email"}
                 </Button>
-              </form>
+              </div>
               <Button
                 variant="secondary"
                 disabled={busy}
                 onClick={() => {
                   setSent(false);
                   setError("");
-                  setToken("");
                 }}
               >
                 Use a different email

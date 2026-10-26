@@ -1,12 +1,19 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowLeft,
   ArrowRight,
+  Briefcase,
   Check,
+  Coins,
+  Handshake,
+  Lightbulb,
+  Megaphone,
   QrCode,
   Upload,
+  UserPlus,
   LoaderCircle,
   Building2,
   Sparkles,
@@ -23,7 +30,7 @@ import {
 import type { Profile } from "@/lib/types";
 import { profileSchema } from "@/lib/validation";
 import { uid } from "@/lib/utils";
-import { events } from "@/lib/events";
+import { attendingEventIds, currentEventFor, events } from "@/lib/events";
 import {
   generatedUsername,
   hasDeveloperRole,
@@ -33,10 +40,11 @@ import {
   profileRoles,
   socialProfileURL,
 } from "@/lib/onboarding";
-import { Avatar, Button, ButtonLink, Tag } from "./ui";
-import { useWorkspace } from "./workspace-provider";
+import { Avatar, Brand, Button, ButtonLink, Tag } from "./ui";
+import { useOnboardingState, useWorkspace } from "./workspace-provider";
 import { SocialLogo } from "./social-logo";
 import { EventLogo } from "./event-brand";
+import { OnboardingArt, stepArtTitles } from "./onboarding-art";
 import { useProfilePhoto } from "./use-profile-photo";
 const platforms = ["X", "LinkedIn", "GitHub", "Website", "Telegram", "Discord"];
 const placeholders: Record<string, string> = {
@@ -68,8 +76,43 @@ const blankCompany = {
   linkedin: "",
   logo: "",
 };
+// These values match the Discover and venue filters, so what people choose
+// here is what others can filter by.
+const goalChoices = [
+  { value: "Co-founder", icon: UserPlus },
+  { value: "Hiring", icon: Briefcase },
+  { value: "Collaborators", icon: Handshake },
+  { value: "Seeking users", icon: Megaphone },
+  { value: "Seeking funding", icon: Coins },
+  { value: "Open to collaboration", icon: Lightbulb },
+] as const;
+const ecosystemChoices = [
+  "Ethereum",
+  "Solana",
+  "Base",
+  "Polygon",
+  "AI",
+  "DeFi",
+  "Infrastructure",
+] as const;
+const totalSteps = 5;
+const stepVariants = {
+  enter: (direction: number) => ({ opacity: 0, x: 36 * direction }),
+  center: { opacity: 1, x: 0 },
+  exit: (direction: number) => ({ opacity: 0, x: -28 * direction }),
+};
 export function ProfileSetup() {
   const { data, user } = useWorkspace();
+  const onboarding = useOnboardingState();
+  if (onboarding === "loading")
+    return (
+      <div className="page-skeleton">
+        <div />
+        <div />
+        <div />
+        <span>Opening your profile…</span>
+      </div>
+    );
   return (
     <ProfileSetupForm
       key={
@@ -83,13 +126,17 @@ function ProfileSetupForm() {
   const router = useRouter();
   const existing = data.profile;
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const reduced = useReducedMotion();
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [failedAvatar, setFailedAvatar] = useState("");
   const [failedLogo, setFailedLogo] = useState("");
   const upload = useRef<HTMLInputElement>(null);
   const heading = useRef<HTMLDivElement>(null);
-  const [event, setEvent] = useState(data.activeEventId || "");
+  const [selectedEvents, setSelectedEvents] = useState<string[]>(() =>
+    attendingEventIds(data),
+  );
   const [eventPicked, setEventPicked] = useState(
     Boolean(data.activeEventId || existing),
   );
@@ -217,14 +264,37 @@ function ProfileSetupForm() {
     }
     return result;
   };
-  const validateYou = () => {
+  const validateName = () => {
     if (!form.name.trim())
       throw new Error("What should we call you? Add your name to continue.");
+  };
+  const validateRoles = () => {
     if (!roles.length)
       throw new Error(
         "Choose at least one role. You can choose more than one.",
       );
   };
+  const validateYou = () => {
+    validateName();
+    validateRoles();
+  };
+  const go = (next: number) => {
+    setDirection(next > step ? 1 : -1);
+    setStep(next);
+    setError("");
+  };
+  const toggleSignal = (key: "lookingFor" | "tags", value: string) =>
+    setForm((current) => {
+      const list = current[key];
+      return {
+        ...current,
+        [key]: list.includes(value)
+          ? list.filter((item) => item !== value)
+          : list.length < 20
+            ? [...list, value]
+            : list,
+      };
+    });
   const validateLinks = () => {
     if (!existing && !normalizedHandle)
       throw new Error("Enter your X / Twitter username to continue.");
@@ -235,19 +305,18 @@ function ProfileSetupForm() {
   const submit = () => {
     setError("");
     try {
+      if (!existing && step < totalSteps - 1) {
+        if (step === 0) validateName();
+        if (step === 1) validateRoles();
+        if (step === 3) validateLinks();
+        go(step + 1);
+        return;
+      }
       validateYou();
-      if (!existing && step === 0) {
-        setStep(1);
-        return;
-      }
       validateLinks();
-      if (!existing && step === 1) {
-        setStep(2);
-        return;
-      }
       if (!existing && !eventPicked)
         throw new Error(
-          "Choose your event, or select ‘Not attending an event yet’.",
+          "Choose your events, or select ‘Not attending an event yet’.",
         );
       const business =
         founder && (company.name || company.designation || companyLink)
@@ -285,7 +354,8 @@ function ProfileSetupForm() {
       update((workspace) => ({
         ...workspace,
         profile: parsed.data,
-        activeEventId: event,
+        eventIds: selectedEvents,
+        activeEventId: currentEventFor(selectedEvents, workspace.activeEventId),
       }));
       toast(
         existing ? "Profile updated." : "You’re ready. Go meet your people.",
@@ -352,9 +422,7 @@ function ProfileSetupForm() {
   );
   const about = (
     <section className="setup-section">
-      <h2>
-        {existing ? "A little about you." : "Hey, welcome. What’s your name?"}
-      </h2>
+      <h2>A little about you.</h2>
       <label>
         Your name
         <input
@@ -526,42 +594,54 @@ function ProfileSetupForm() {
   );
   const eventSection = (
     <section className="setup-section setup-event-step">
-      <h2>Which event are you attending?</h2>
+      <h2>Which events are you attending?</h2>
       <p className="form-footnote">
-        Your connections will remember this event and the time you meet. You can
-        change it later.
+        Pick every event you’re going to. Your connections will remember the
+        event and the time you meet. You can change this later.
       </p>
-      <div className="setup-event-logos" aria-label="Choose your event">
-        {events.map((item) => (
-          <button
-            type="button"
-            key={item.id}
-            className={event === item.id ? "selected" : ""}
-            aria-label={`Choose ${item.name}`}
-            aria-pressed={event === item.id}
-            onClick={() => {
-              setEvent(item.id);
-              setEventPicked(true);
-            }}
-          >
-            <EventLogo event={item} decorative />
-            <span>{item.shortName}</span>
-            <small>{item.dates}</small>
-            {event === item.id && <Check size={14} />}
-          </button>
-        ))}
+      <div
+        className="setup-event-logos"
+        role="group"
+        aria-label="Choose your events"
+      >
+        {events.map((item) => {
+          const chosen = selectedEvents.includes(item.id);
+          return (
+            <button
+              type="button"
+              key={item.id}
+              className={chosen ? "selected" : ""}
+              aria-label={`Choose ${item.name}`}
+              aria-pressed={chosen}
+              onClick={() => {
+                setSelectedEvents((current) =>
+                  current.includes(item.id)
+                    ? current.filter((id) => id !== item.id)
+                    : [...current, item.id],
+                );
+                setEventPicked(true);
+              }}
+            >
+              <EventLogo event={item} decorative />
+              <span>{item.shortName}</span>
+              <small>{item.dates}</small>
+              {chosen && <Check size={14} />}
+            </button>
+          );
+        })}
       </div>
       <Button
         type="button"
         variant="ghost"
-        aria-pressed={eventPicked && !event}
+        aria-pressed={eventPicked && !selectedEvents.length}
         className="skip-event"
         onClick={() => {
-          setEvent("");
+          setSelectedEvents([]);
           setEventPicked(true);
         }}
       >
-        {eventPicked && !event && <Check size={14} />}Not attending an event yet
+        {eventPicked && !selectedEvents.length && <Check size={14} />}Not
+        attending an event yet
       </Button>
       <details className="setup-more">
         <summary>Profile visibility</summary>
@@ -751,57 +831,230 @@ function ProfileSetupForm() {
       </details>
     </section>
   );
+  if (!existing) {
+    const allRoles = [...new Set([...onboardingRoles, ...roles])];
+    const nameStep = (
+      <section className="setup-section onb-question">
+        <h2>Hey, welcome. What’s your name?</h2>
+        <p className="onb-sub">
+          This is how people see you when they scan your QR.
+        </p>
+        <label className="onb-name-field">
+          <span>Your name</span>
+          <input
+            required
+            maxLength={100}
+            autoComplete="name"
+            value={form.name}
+            onChange={(e) => field("name", e.target.value)}
+            placeholder="What should we call you?"
+          />
+        </label>
+      </section>
+    );
+    const rolesStep = (
+      <section className="setup-section onb-question">
+        <h2>What do you do?</h2>
+        <p className="onb-sub">
+          Choose all that fit. A builder can wear more than one hat.
+        </p>
+        <fieldset className="onb-fieldset">
+          <legend className="sr-only">Your roles</legend>
+          <div className="onb-choice-grid">
+            {allRoles.map((role) => {
+              const Icon =
+                roleIcons[role as keyof typeof roleIcons] || CircleUserRound;
+              const on = roles.includes(role);
+              return (
+                <button
+                  key={role}
+                  type="button"
+                  className={`onb-choice ${on ? "on" : ""}`}
+                  aria-pressed={on}
+                  onClick={() => toggleRole(role)}
+                >
+                  <Icon size={18} />
+                  <span>{role}</span>
+                  {on && <Check size={15} className="onb-choice-check" />}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      </section>
+    );
+    const signalsStep = (
+      <section className="setup-section onb-question">
+        <h2>What brings you to Mumbai?</h2>
+        <p className="onb-sub">
+          Pick any that apply, or skip. It helps the right people find you.
+        </p>
+        <fieldset className="onb-fieldset">
+          <legend className="onb-group">I’m looking for</legend>
+          <div className="onb-choice-grid">
+            {goalChoices.map(({ value, icon: Icon }) => {
+              const on = form.lookingFor.includes(value);
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  className={`onb-choice ${on ? "on" : ""}`}
+                  aria-pressed={on}
+                  onClick={() => toggleSignal("lookingFor", value)}
+                >
+                  <Icon size={18} />
+                  <span>{value}</span>
+                  {on && <Check size={15} className="onb-choice-check" />}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+        <fieldset className="onb-fieldset">
+          <legend className="onb-group">I’m into</legend>
+          <div className="onb-choice-grid onb-chips">
+            {ecosystemChoices.map((value) => {
+              const on = form.tags.includes(value);
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  className={`onb-choice onb-chip-choice ${on ? "on" : ""}`}
+                  aria-pressed={on}
+                  onClick={() => toggleSignal("tags", value)}
+                >
+                  <span>{value}</span>
+                  {on && <Check size={14} className="onb-choice-check" />}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      </section>
+    );
+    const [artTitle, artSub] = stepArtTitles[step];
+    const content = [nameStep, rolesStep, signalsStep, links, eventSection][
+      step
+    ];
+    return (
+      <div className="simple-onboarding streamlined-onboarding onb" ref={heading}>
+        <aside className="onb-art">
+          <Brand light linked={false} />
+          <OnboardingArt
+            step={step}
+            name={form.name}
+            roles={roles}
+            allRoles={allRoles}
+            signals={form.lookingFor.length + form.tags.length}
+            avatar={shownAvatar}
+            handle={normalizedHandle || ""}
+            selected={selectedEvents}
+            events={events}
+          />
+          <div className="onb-caption">
+            <strong>{artTitle}</strong>
+            <span>{artSub}</span>
+          </div>
+        </aside>
+        <div className="onb-panel">
+          <div className="onb-top">
+            <div
+              className="setup-progress onb-progress"
+              role="progressbar"
+              aria-label={`Onboarding step ${step + 1} of ${totalSteps}`}
+              aria-valuemin={1}
+              aria-valuemax={totalSteps}
+              aria-valuenow={step + 1}
+            >
+              {Array.from({ length: totalSteps }, (_, index) => (
+                <span
+                  key={index}
+                  className={
+                    index === step ? "active" : index < step ? "done" : ""
+                  }
+                />
+              ))}
+            </div>
+            <span className="onb-count">
+              {step + 1} / {totalSteps}
+            </span>
+          </div>
+          <form
+            noValidate
+            className="onb-form form-stack"
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit();
+            }}
+          >
+            <h1 className="sr-only">Set up your Connect IRL profile</h1>
+            <AnimatePresence mode="wait" initial={false} custom={direction}>
+              <motion.div
+                key={step}
+                className="onb-step"
+                custom={direction}
+                variants={stepVariants}
+                initial={reduced ? false : "enter"}
+                animate="center"
+                exit={reduced ? undefined : "exit"}
+                transition={{ duration: 0.22, ease: [0.2, 0.75, 0.25, 1] }}
+              >
+                {content}
+              </motion.div>
+            </AnimatePresence>
+            {error && (
+              <p className="form-error" role="alert">
+                {error}
+              </p>
+            )}
+            <div className="button-row setup-actions onb-actions">
+              {step > 0 && (
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => go(step - 1)}
+                >
+                  <ArrowLeft size={14} />
+                  Back
+                </Button>
+              )}
+              {step === 2 && (
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => go(step + 1)}
+                >
+                  Skip for now
+                </Button>
+              )}
+              <Button type="submit" disabled={uploading}>
+                {step < totalSteps - 1 ? "Continue" : "Finish setup"}
+                {step < totalSteps - 1 ? (
+                  <ArrowRight size={15} />
+                ) : (
+                  <Check size={15} />
+                )}
+              </Button>
+            </div>
+            <Tag>Private meeting notes. Always.</Tag>
+          </form>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="simple-onboarding streamlined-onboarding">
       <div className="page-heading" ref={heading}>
         <div>
-          <span className="app-eyebrow">
-            {existing
-              ? "YOUR PROFILE, YOUR WAY"
-              : "ONE PROFILE. YOUR NEXT GREAT HELLO."}
-          </span>
-          <h1>
-            {existing
-              ? "Your profile & links."
-              : step === 0
-                ? "Let’s get you connected."
-                : step === 1
-                  ? "Make it easy to say hello."
-                  : "Your people are out there."}
-          </h1>
-          <p>
-            {existing
-              ? "Update your details whenever you like."
-              : step === 0
-                ? "Three quick steps. Start with you."
-                : step === 1
-                  ? "Your X photo comes along for the introduction."
-                  : "Pick your event, then you’re ready to connect."}
-          </p>
+          <span className="app-eyebrow">YOUR PROFILE, YOUR WAY</span>
+          <h1>Your profile & links.</h1>
+          <p>Update your details whenever you like.</p>
         </div>
-        {existing && (
-          <ButtonLink href="/app">
-            <QrCode size={15} />
-            My workspace
-          </ButtonLink>
-        )}
+        <ButtonLink href="/app">
+          <QrCode size={15} />
+          My workspace
+        </ButtonLink>
       </div>
-      {!existing && (
-        <div
-          className="setup-progress"
-          aria-label={`Onboarding step ${step + 1} of 3`}
-        >
-          {["You", "Your links", "Your event"].map((label, index) => (
-            <span
-              key={label}
-              className={index === step ? "active" : index < step ? "done" : ""}
-            >
-              <b>{index < step ? <Check size={13} /> : index + 1}</b>
-              {label}
-            </span>
-          ))}
-        </div>
-      )}
       <form
         noValidate
         className="app-panel form-stack simple-profile-form"
@@ -810,11 +1063,11 @@ function ProfileSetupForm() {
           submit();
         }}
       >
-        <div className="setup-step" key={existing ? "editing" : step}>
-          {(existing || step === 0) && about}
-          {existing && advanced}
-          {(existing || step === 1) && links}
-          {(existing || step === 2) && eventSection}
+        <div className="setup-step" key="editing">
+          {about}
+          {advanced}
+          {links}
+          {eventSection}
         </div>
         {error && (
           <p className="form-error" role="alert">
@@ -822,30 +1075,9 @@ function ProfileSetupForm() {
           </p>
         )}
         <div className="button-row setup-actions">
-          {!existing && step > 0 && (
-            <Button
-              variant="ghost"
-              type="button"
-              onClick={() => {
-                setStep(step - 1);
-                setError("");
-              }}
-            >
-              <ArrowLeft size={14} />
-              Back
-            </Button>
-          )}
           <Button type="submit" disabled={uploading}>
-            {existing
-              ? "Save my profile"
-              : step < 2
-                ? "Continue"
-                : "Finish setup"}
-            {!existing && step < 2 ? (
-              <ArrowRight size={15} />
-            ) : (
-              <Check size={15} />
-            )}
+            Save my profile
+            <Check size={15} />
           </Button>
         </div>
         <Tag>Private meeting notes. Always.</Tag>

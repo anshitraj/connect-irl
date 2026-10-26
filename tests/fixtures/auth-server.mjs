@@ -109,14 +109,19 @@ createServer(async (request, response) => {
   if (url.pathname === "/health") return send({ ready: true });
   if (url.pathname === "/auth/v1/otp") return send({});
   if (url.pathname === "/auth/v1/verify") {
-    if (body.token !== "123456")
+    // Sign-in links carry token_hash = "fixture_" + base64url(email); anything else is expired.
+    const linkEmail = body.token_hash?.startsWith("fixture_")
+      ? Buffer.from(body.token_hash.slice(8), "base64url").toString()
+      : "";
+    const email = linkEmail || (body.token === "123456" ? body.email : "");
+    if (!email)
       return send(
         { msg: "Token has expired or is invalid", code: "otp_expired" },
         403,
       );
-    let person = [...users.values()].find((item) => item.email === body.email);
+    let person = [...users.values()].find((item) => item.email === email);
     if (!person) {
-      person = user(randomUUID(), body.email);
+      person = user(randomUUID(), email);
       users.set(person.id, person);
     }
     return send(session(person));

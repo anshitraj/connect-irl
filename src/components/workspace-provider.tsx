@@ -138,6 +138,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           bookmarks: snapshot.bookmarks.filter((b) => !b.startsWith("sample-")),
           eventBookmarks: snapshot.eventBookmarks,
           activeEventId: snapshot.activeEventId || "",
+          eventIds: snapshot.eventIds || [],
           blocked: snapshot.blocked,
           deleted: pending.deleted,
           preferencesChanged: pending.preferencesChanged,
@@ -289,12 +290,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           before.eventBookmarks,
           before.blocked,
           before.activeEventId,
+          before.eventIds,
         ]) !==
         JSON.stringify([
           next.bookmarks,
           next.eventBookmarks,
           next.blocked,
           next.activeEventId,
+          next.eventIds,
         ]);
       pending.revision++;
       current.current = next;
@@ -358,6 +361,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
                   bookmarks: current.current.bookmarks,
                   eventBookmarks: current.current.eventBookmarks,
                   activeEventId: current.current.activeEventId || "",
+                  eventIds: current.current.eventIds || [],
                   blocked: current.current.blocked,
                 }
               : {}),
@@ -534,6 +538,15 @@ export function useWorkspace() {
   const store = useContext(Context);
   if (!store) throw new Error("Workspace provider is missing");
   return store;
+}
+// "loading" while a signed-in account's cloud profile is still being fetched, so
+// returning members never see a flash of first-time onboarding.
+export function useOnboardingState(): "loading" | "needed" | "done" {
+  const { ready, data, user, demo, syncStatus } = useWorkspace();
+  if (!ready) return "loading";
+  if (data.profile) return "done";
+  if (user && !demo && syncStatus === "pending") return "loading";
+  return "needed";
 }
 export { cloudConfigured };
 function subscribeOnline(callback: () => void) {

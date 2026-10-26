@@ -21,11 +21,11 @@ test("installed PWA reloads a previously visited contact book offline", async ({
     page.getByText("CONNECTION SAVED", { exact: true }),
   ).toBeVisible();
   await page.goto("/app/people");
-  await expect(page.locator(".contact-row")).toHaveCount(1);
+  await expect(page.locator(".contact-card")).toHaveCount(1);
   await page.reload();
   await context.setOffline(true);
   await page.reload();
-  await expect(page.locator(".contact-row")).toHaveCount(1);
+  await expect(page.locator(".contact-card")).toHaveCount(1);
   await expect(
     page.getByText("Offline · saved locally", { exact: true }),
   ).toBeVisible();
@@ -42,7 +42,7 @@ test("installed PWA reloads a previously visited contact book offline", async ({
   await context.setOffline(false);
   await page.goto("/app/people");
   await page.reload();
-  await expect(page.locator(".contact-row")).toHaveCount(2);
+  await expect(page.locator(".contact-card")).toHaveCount(2);
   expect(errors).toEqual([]);
 });
 test("landing loads without scanner, map tiles, or third-party avatar requests", async ({

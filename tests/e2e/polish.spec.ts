@@ -8,7 +8,8 @@ test("event artwork loads locally and saved-event filtering persists", async ({
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/app/events");
   const cards = page.locator(".directory-event");
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
+  // ETHGlobal has no self-hosted organizer logo, so its artwork uses text.
   const logos = page.locator(".directory-event .conference-art img");
   await expect(logos).toHaveCount(3);
   await expect
@@ -43,11 +44,11 @@ test("event artwork loads locally and saved-event filtering persists", async ({
     page.getByText("Your event shortlist starts here."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Show all events" }).click();
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
   await page.getByLabel("Find an event or venue").fill("no-such-venue");
   await expect(page.getByText("No events match, yet.")).toBeVisible();
   await page.getByRole("button", { name: "Show all events" }).click();
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
   await expect
     .poll(() =>
       page
@@ -102,7 +103,7 @@ test("dashboard event logos remain legible with motion disabled", async ({
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/app");
   const cards = page.locator(".compact-event");
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
   await cards.last().scrollIntoViewIfNeeded();
   await expect
     .poll(() =>

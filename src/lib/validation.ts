@@ -106,6 +106,7 @@ export const syncSchema = z.object({
   bookmarks: z.array(z.string().max(100)).max(5000),
   eventBookmarks: z.array(z.string().max(100)).max(100),
   activeEventId: z.string().max(100).default(""),
+  eventIds: z.array(z.string().max(100)).max(20).default([]),
   blocked: z.array(z.uuid()).max(1000),
   preferencesChanged: z.boolean().default(true),
   deleted: z

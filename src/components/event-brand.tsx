@@ -14,7 +14,14 @@ export function EventLogo({
 }) {
   const brand = eventBrands[event.id];
   if (!brand)
-    return <span className={`event-logo ${className}`}>{event.shortName}</span>;
+    return (
+      <span
+        className={`event-logo event-logo-wordmark ${className}`}
+        style={{ color: event.color }}
+      >
+        {event.shortName}
+      </span>
+    );
   return (
     <span className={`event-logo event-logo-${brand.theme} ${className}`}>
       <Image

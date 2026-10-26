@@ -63,7 +63,49 @@ export const events: EventInfo[] = [
     color: "#332b55",
     symbol: "≋",
   },
+  {
+    id: "ethglobal-2026",
+    slug: "ethglobal-mumbai-2026",
+    name: "ETHGlobal Mumbai",
+    shortName: "ETHGlobal",
+    dates: "NOV 5–7, 2026",
+    start: "2026-11-05",
+    end: "2026-11-07",
+    venue: "Jio World Convention Centre",
+    address: "G Block, Bandra Kurla Complex, Bandra East, Mumbai 400051",
+    city: "Mumbai, India",
+    coordinates: [72.879, 19.0636],
+    website: "https://ethglobal.com/events/mumbai",
+    source: "https://ethglobal.com/events",
+    organizer: "ETHGlobal",
+    description:
+      "Three days of hacking with Ethereum builders from across India and the world, the same week as Devcon.",
+    color: "#2d5bff",
+    symbol: "◇",
+  },
 ];
 export function eventById(id: string) {
   return events.find((e) => e.id === id || e.slug === id);
+}
+/** Events the user is attending. Older saved workspaces only stored the current event. */
+export function attendingEventIds(workspace: {
+  eventIds?: string[];
+  activeEventId?: string;
+}) {
+  const ids = workspace.eventIds?.length
+    ? workspace.eventIds
+    : workspace.activeEventId
+      ? [workspace.activeEventId]
+      : [];
+  return ids.filter((id) => events.some((event) => event.id === id));
+}
+/** Keeps the current event among those attended, falling back to the earliest one. */
+export function currentEventFor(ids: string[], preferred = "") {
+  if (preferred && ids.includes(preferred)) return preferred;
+  return (
+    [...ids]
+      .map((id) => events.find((event) => event.id === id))
+      .filter((event): event is EventInfo => Boolean(event))
+      .sort((a, b) => a.start.localeCompare(b.start))[0]?.id || ""
+  );
 }

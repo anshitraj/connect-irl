@@ -302,8 +302,11 @@ test("venue discovery filters real response data, saves context, and removes exp
     .getByRole("button", { name: "Save connection", exact: true })
     .click();
   await expect(
-    page.getByRole("dialog").getByLabel("Where did you meet?"),
-  ).toHaveValue("ibw-2026");
+    page.getByRole("dialog").getByText("Met at India Blockchain Week"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("dialog").getByLabel("Name", { exact: false }),
+  ).toHaveCount(0);
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save connection", exact: true })

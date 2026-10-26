@@ -29,7 +29,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import { useRef, useState } from "react";
-import { ContactRow, ReminderDialog } from "./contact-tools";
+import { ContactCard, ReminderDialog } from "./contact-tools";
 import { ConnectLink } from "./connect-link";
 import {
   Avatar,
@@ -260,14 +260,9 @@ export function People() {
         {query && " · matched against names, projects, notes, and events"}
       </p>
       {contacts.length ? (
-        <div className="app-panel people-list-panel">
-          <div className="list-column-head">
-            <span>THE PERSON</span>
-            <span>THEIR WORLD</span>
-            <span>THE CONTEXT</span>
-          </div>
+        <div className="contact-card-grid">
           {contacts.map((c) => (
-            <ContactRow key={c.id} contact={c} />
+            <ContactCard key={c.id} contact={c} />
           ))}
         </div>
       ) : (

@@ -133,8 +133,10 @@ test("profile onboarding, QR generation, public local preview, repeated save ded
 }) => {
   await page.goto("/app/profile");
   await page.getByLabel("Your name").fill("Test Builder");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByRole("button", { name: "Founder", exact: true }).click();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "Skip for now", exact: true }).click();
   await page.getByLabel("X / Twitter", { exact: true }).fill("@test_builder");
   await page.getByLabel("Business name", { exact: true }).fill("Test Rail");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -185,7 +187,7 @@ test("profile onboarding, QR generation, public local preview, repeated save ded
     .getByRole("button", { name: "Save connection", exact: true })
     .click();
   await page.goto("/app/people");
-  await expect(page.locator(".contact-row")).toHaveCount(1);
+  await expect(page.locator(".contact-card")).toHaveCount(1);
   await page
     .locator("main")
     .getByRole("link", { name: /Test Builder/ })
@@ -358,7 +360,7 @@ test("CSV import, contact edits, and safe merging preserve meeting context", asy
       "name,headline,project,url,notes\nAsha Rao,Engineer,Rail,https://example.com/asha,First conversation\nAsha R.,Founder,Rail,,Second conversation",
     ),
   });
-  await expect(page.locator(".contact-row")).toHaveCount(2);
+  await expect(page.locator(".contact-card")).toHaveCount(2);
   await page.getByRole("link", { name: /Asha R\. Founder/ }).click();
   await page
     .getByRole("button", { name: "Edit contact details", exact: true })
@@ -388,5 +390,5 @@ test("CSV import, contact edits, and safe merging preserve meeting context", asy
     page.getByText("Second conversation", { exact: true }),
   ).toBeVisible();
   await page.goto("/app/people");
-  await expect(page.locator(".contact-row")).toHaveCount(1);
+  await expect(page.locator(".contact-card")).toHaveCount(1);
 });

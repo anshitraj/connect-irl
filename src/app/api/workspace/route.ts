@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { authorizeMutation } from "@/lib/api-security";
+import { notifyNewConnections } from "@/lib/email/notify-connections";
 import { serverSupabase } from "@/lib/supabase/server";
 import { syncSchema } from "@/lib/validation";
 export async function GET() {
@@ -34,6 +36,7 @@ export async function GET() {
     eventBookmarks: results[4].data?.data?.eventBookmarks || [],
     blocked: results[4].data?.data?.blocked || [],
     activeEventId: results[4].data?.data?.activeEventId || "",
+    eventIds: results[4].data?.data?.eventIds || [],
   });
 }
 export async function POST(request: Request) {
@@ -82,6 +85,9 @@ export async function POST(request: Request) {
       },
       { status: 409 },
     );
+  // Saving a public profile records a receipt in the same transaction; email its owner
+  // after the response so sync latency never depends on the mail provider.
+  if (payload.contacts.length) after(() => notifyNewConnections(user.id));
   const canonicalIds = Object.values(contactIds || {}) as string[];
   const { data: contacts } = canonicalIds.length
     ? await sb

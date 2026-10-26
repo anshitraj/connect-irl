@@ -12,8 +12,8 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import { Avatar, Button, Modal, Tag } from "./ui";
+import { useState, type CSSProperties } from "react";
+import { Avatar, Button, Modal } from "./ui";
 import { useWorkspace } from "./workspace-provider";
 export function SaveContactDialog({
   open,
@@ -39,22 +39,26 @@ export function SaveContactDialog({
   );
   const [tags, setTags] = useState<string[]>(initial?.tags || []);
   const [error, setError] = useState("");
+  // Someone with a Connect IRL profile already has a name, headline and links,
+  // so only an optional note is asked for.
+  const quick = Boolean(initial?.profileId);
+  const meetingEvent = eventById(eventId);
   return (
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title={
-        initial?.profileId
-          ? "A good hello, remembered."
-          : "Add a new connection"
+      title={quick ? "A good hello, remembered." : "Add a new connection"}
+      description={
+        quick
+          ? "Add a quick note, or just save."
+          : "A name is enough. A little context makes it memorable."
       }
-      description="A name is enough. A little context makes it memorable."
     >
       <form
         className="form-stack"
         onSubmit={(e) => {
           e.preventDefault();
-          if (url && !safeUrl(url)) {
+          if (!quick && url && !safeUrl(url)) {
             setError("Use a full https:// or http:// profile link.");
             return;
           }
@@ -67,14 +71,15 @@ export function SaveContactDialog({
               name: name.trim(),
               headline,
               project,
-              links: url
-                ? [
-                    {
-                      label: initial?.links?.[0]?.label || "Website",
-                      url: safeUrl(url)!,
-                    },
-                  ]
-                : initial?.links || [],
+              links:
+                !quick && url
+                  ? [
+                      {
+                        label: initial?.links?.[0]?.label || "Website",
+                        url: safeUrl(url)!,
+                      },
+                    ]
+                  : initial?.links || [],
               tags,
               avatar: initial?.avatar || "",
               profileId: initial?.profileId,
@@ -90,67 +95,74 @@ export function SaveContactDialog({
           onSaved?.(id);
         }}
       >
-        {initial?.avatar && (
+        {(quick || initial?.avatar) && (
           <div className="contact-dialog-identity">
-            <Avatar name={name} src={initial.avatar} size="lg" />
+            <Avatar name={name} src={initial?.avatar} size="lg" />
             <div>
               <strong>{name}</strong>
               <span>{headline}</span>
             </div>
           </div>
         )}
-        <div className="form-row">
-          <label>
-            Name <span className="required">*</span>
-            <input
-              required
-              maxLength={100}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Who did you meet?"
-              autoComplete="off"
-            />
-          </label>
-          <label>
-            Role / headline
-            <input
-              maxLength={180}
-              value={headline}
-              onChange={(e) => setHeadline(e.target.value)}
-              placeholder="Engineer, founder, curious human…"
-            />
-          </label>
-        </div>
-        <label>
-          Project or company
-          <input
-            maxLength={100}
-            value={project}
-            onChange={(e) => setProject(e.target.value)}
-            placeholder="What are they building?"
-          />
-        </label>
-        <label>
-          Profile link
-          <input
-            type="url"
-            maxLength={2048}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://linkedin.com/in/…"
-          />
-        </label>
-        <label>
-          Where did you meet?
-          <select value={eventId} onChange={(e) => setEventId(e.target.value)}>
-            <option value="">No event / somewhere else</option>
-            {events.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {!quick && (
+          <>
+            <div className="form-row">
+              <label>
+                Name <span className="required">*</span>
+                <input
+                  required
+                  maxLength={100}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Who did you meet?"
+                  autoComplete="off"
+                />
+              </label>
+              <label>
+                Role / headline
+                <input
+                  maxLength={180}
+                  value={headline}
+                  onChange={(e) => setHeadline(e.target.value)}
+                  placeholder="Engineer, founder, curious human…"
+                />
+              </label>
+            </div>
+            <label>
+              Project or company
+              <input
+                maxLength={100}
+                value={project}
+                onChange={(e) => setProject(e.target.value)}
+                placeholder="What are they building?"
+              />
+            </label>
+            <label>
+              Profile link
+              <input
+                type="url"
+                maxLength={2048}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://linkedin.com/in/…"
+              />
+            </label>
+            <label>
+              Where did you meet?
+              <select
+                value={eventId}
+                onChange={(e) => setEventId(e.target.value)}
+              >
+                <option value="">No event / somewhere else</option>
+                {events.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
         <label>
           <span className="label-with-icon">
             <LockKeyhole size={12} />A note, just for you
@@ -159,32 +171,46 @@ export function SaveContactDialog({
             value={note}
             maxLength={5000}
             onChange={(e) => setNote(e.target.value)}
-            rows={3}
-            placeholder="That idea you both got excited about…"
+            rows={quick ? 2 : 3}
+            placeholder={
+              quick
+                ? "Optional: a quick note to remember them by"
+                : "That idea you both got excited about…"
+            }
           />
         </label>
-        <div className="quick-tags">
-          {[
-            "Follow up",
-            "Collaborator",
-            "Hiring",
-            "Investor",
-            "Interesting project",
-          ].map((t) => (
-            <button
-              type="button"
-              key={t}
-              onClick={() =>
-                setTags(
-                  tags.includes(t) ? tags.filter((v) => v !== t) : [...tags, t],
-                )
-              }
-              className={tags.includes(t) ? "active" : ""}
-            >
-              {tags.includes(t) ? <Check size={11} /> : <Plus size={11} />} {t}
-            </button>
-          ))}
-        </div>
+        {quick && meetingEvent && (
+          <p className="form-footnote">
+            <CalendarDays size={11} /> Met at {meetingEvent.name}
+          </p>
+        )}
+        {!quick && (
+          <div className="quick-tags">
+            {[
+              "Follow up",
+              "Collaborator",
+              "Hiring",
+              "Investor",
+              "Interesting project",
+            ].map((t) => (
+              <button
+                type="button"
+                key={t}
+                onClick={() =>
+                  setTags(
+                    tags.includes(t)
+                      ? tags.filter((v) => v !== t)
+                      : [...tags, t],
+                  )
+                }
+                className={tags.includes(t) ? "active" : ""}
+              >
+                {tags.includes(t) ? <Check size={11} /> : <Plus size={11} />}{" "}
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
         {error && (
           <p className="form-error" role="alert">
             {error}
@@ -201,46 +227,42 @@ export function SaveContactDialog({
     </Modal>
   );
 }
-export function ContactRow({ contact }: { contact: Contact }) {
+// A saved connection as a square profile card, the way files show in a folder grid.
+const coverHue = (name: string) =>
+  120 + ([...name].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 80);
+export function ContactCard({ contact }: { contact: Contact }) {
   const { update } = useWorkspace();
   const meeting = contact.meetings.at(-1);
   const event = meeting && eventById(meeting.eventId);
   return (
-    <div className="contact-row">
-      <Link href={`/app/people/${contact.id}`} className="contact-row-main">
-        <Avatar name={contact.name} src={contact.avatar} />
-        <span>
-          <strong>
-            {contact.name}
-            {contact.sample && <span className="sample-badge">SAMPLE</span>}
-          </strong>
-          <small>
-            {contact.headline || contact.project || "A new connection"}
-          </small>
+    <div
+      className="contact-card"
+      style={{ "--hue": coverHue(contact.name) } as CSSProperties}
+    >
+      <Link href={`/app/people/${contact.id}`} className="contact-card-link">
+        <span className="contact-card-cover" aria-hidden="true" />
+        <Avatar name={contact.name} src={contact.avatar} size="xl" />
+        <strong>
+          {contact.name}
+          {contact.sample && <span className="sample-badge">SAMPLE</span>}
+        </strong>
+        <small>{contact.headline || contact.project || "A new connection"}</small>
+        <span className="contact-card-meta">
+          {event ? (
+            <>
+              <CalendarDays size={12} />
+              {event.shortName}
+            </>
+          ) : (
+            <>
+              <FileText size={12} />
+              {meeting?.note ? "Context saved" : "Add some context"}
+            </>
+          )}
         </span>
       </Link>
-      <div className="contact-row-tags">
-        {contact.tags.slice(0, 2).map((t, i) => (
-          <Tag color={i % 2 ? "purple" : "gray"} key={t}>
-            {t}
-          </Tag>
-        ))}
-      </div>
-      <span className="contact-row-event">
-        {event ? (
-          <>
-            <CalendarDays size={12} />
-            {event.shortName}
-          </>
-        ) : (
-          <>
-            <FileText size={12} />
-            {meeting?.note ? "Context saved" : "Add some context"}
-          </>
-        )}
-      </span>
       <button
-        className={`icon-button star-button ${contact.starred ? "starred" : ""}`}
+        className={`icon-button star-button contact-card-star ${contact.starred ? "starred" : ""}`}
         aria-label={`${contact.starred ? "Unstar" : "Star"} ${contact.name}`}
         onClick={() =>
           update((w) => ({

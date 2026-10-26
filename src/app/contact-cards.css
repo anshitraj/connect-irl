@@ -1,0 +1,168 @@
+/* Saved connections as square profile cards, like icons in a folder. */
+.contact-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 16px;
+}
+.contact-card {
+  --hue: 150;
+  position: relative;
+  display: flex;
+  border: 1px solid #dce8df;
+  border-radius: 22px;
+  background: #fff;
+  overflow: hidden;
+  transition:
+    transform 200ms var(--ease-out-craft),
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+.contact-card:hover,
+.contact-card:focus-within {
+  transform: translateY(-3px);
+  border-color: #aed3bb;
+  box-shadow: 0 16px 32px #053d2b18;
+}
+.contact-card-link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 206px;
+  padding: 0 14px 16px;
+  text-align: center;
+}
+.contact-card-cover {
+  align-self: stretch;
+  height: 62px;
+  margin: 0 -14px;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--hue) 55% 90%),
+    hsl(calc(var(--hue) + 28) 50% 82%)
+  );
+}
+.contact-card .avatar {
+  width: 78px;
+  height: 78px;
+  margin-top: -39px;
+  border: 4px solid #fff;
+  font-size: 26px;
+  box-shadow: 0 6px 16px #053d2b1f;
+}
+.contact-card-link strong {
+  max-width: 100%;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.2px;
+  color: #10261b;
+  overflow-wrap: anywhere;
+}
+.contact-card-link small {
+  display: -webkit-box;
+  max-width: 100%;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #52665a;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.contact-card-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  padding: 5px 10px;
+  border-radius: 99px;
+  background: #eef7f1;
+  font-size: 11px;
+  color: #2f5a45;
+}
+.contact-card-link strong .sample-badge {
+  margin-left: 6px;
+  font-size: 8px;
+}
+.contact-card-star {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffffd9;
+  color: #4a5f52;
+  backdrop-filter: blur(6px);
+}
+.contact-card-star.starred {
+  color: #8a6c35;
+}
+.contact-card-grid-compact {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 4px 18px 18px;
+}
+.contact-card-grid-compact .contact-card-link {
+  min-height: 180px;
+}
+.share-nfc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 14px;
+  border: 1px solid #dce8df;
+  border-radius: 16px;
+  background: #f5faf6;
+  text-align: left;
+}
+.share-nfc > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  font-size: 13px;
+  color: #10261b;
+}
+.share-nfc > div span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #52665a;
+}
+.share-nfc-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #e0f3e7;
+  color: #0a6b3f;
+}
+@media (max-width: 560px) {
+  .contact-card-grid,
+  .contact-card-grid-compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .contact-card-grid-compact {
+    padding-inline: 14px;
+  }
+  .share-nfc {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-card {
+    transition: none;
+  }
+  .contact-card:hover,
+  .contact-card:focus-within {
+    transform: none;
+  }
+}

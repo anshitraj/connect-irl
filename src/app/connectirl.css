@@ -140,6 +140,8 @@
 }
 .quick-scanner .quick-scan-error {
   color: #ffcebd;
+  background: #3b1f1d;
+  border-color: #6e3a35;
 }
 .quick-scanner .camera-controls > .icon-button {
   color: var(--irl-fg);

@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "email:assets": "node scripts/build-email-assets.mjs",
+    "email:templates": "vitest run tests/unit/email-templates.test.ts -u",
     "test:e2e": "playwright test",
     "format": "prettier --write src tests *.ts *.mjs public/sw.js",
     "test:production": "playwright test --config playwright.production.config.ts",
