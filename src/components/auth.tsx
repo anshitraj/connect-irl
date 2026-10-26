@@ -11,8 +11,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Github } from "./icons";
 import { Brand, Button, ButtonLink } from "./ui";
 export function Auth({ signup = false }: { signup?: boolean }) {
@@ -126,11 +126,14 @@ export function Auth({ signup = false }: { signup?: boolean }) {
           </h2>
           <p>
             {sent
-              ? `Enter the 6-digit code sent to ${email.trim()}. It verifies your email and signs you in.`
+              ? `We emailed a sign-in link to ${email.trim()}. Open it in this browser to sign in, or enter the 6-digit code from the same email.`
               : signup
                 ? "Continue with Google, then finish three quick profile steps."
                 : "Your people and possibilities are right where you left them."}
           </p>
+          <Suspense fallback={null}>
+            <ExpiredLinkNotice />
+          </Suspense>
           {error && (
             <p className="form-error" role="alert">
               {error}
@@ -213,8 +216,8 @@ export function Auth({ signup = false }: { signup?: boolean }) {
                   onClick={() => void sendCode()}
                 >
                   {remaining > 0
-                    ? `Resend code in ${remaining}s`
-                    : "Resend code"}
+                    ? `Resend email in ${remaining}s`
+                    : "Resend email"}
                 </Button>
               </form>
               <Button
@@ -282,7 +285,7 @@ export function Auth({ signup = false }: { signup?: boolean }) {
                     ) : (
                       <Mail size={16} />
                     )}
-                    Send verification code
+                    Email me a sign-in link
                     <ArrowRight size={15} />
                   </Button>
                   <p className="form-footnote">
@@ -326,6 +329,15 @@ export function Auth({ signup = false }: { signup?: boolean }) {
       </section>
     </main>
   );
+}
+// /auth/callback sends failed sign-in links back here with ?error=expired.
+function ExpiredLinkNotice() {
+  return useSearchParams().get("error") === "expired" ? (
+    <p className="form-error" role="alert">
+      That sign-in link expired or was opened in a different browser. Request a
+      new one below.
+    </p>
+  ) : null;
 }
 function GoogleIcon() {
   return (

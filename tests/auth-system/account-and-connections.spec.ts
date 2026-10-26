@@ -6,7 +6,7 @@ async function enterEmail(page: Page, email: string) {
   await page.getByText("Other ways to sign in", { exact: true }).click();
   await page.getByLabel("Email address", { exact: true }).fill(email);
   await page
-    .getByRole("button", { name: "Send verification code", exact: true })
+    .getByRole("button", { name: "Email me a sign-in link", exact: true })
     .click();
   await expect(
     page.getByLabel("Verification code", { exact: true }),
@@ -29,7 +29,7 @@ test("email ownership is verified, invalid codes fail, and returning members ent
   await expect(page).toHaveURL(/\/$/);
   await enterEmail(page, "priya@example.com");
   await expect(
-    page.getByRole("button", { name: /Resend code in/ }),
+    page.getByRole("button", { name: /Resend email in/ }),
   ).toBeDisabled();
   await page.getByLabel("Verification code", { exact: true }).fill("999999");
   await page

@@ -10,7 +10,7 @@ async function begin(page: import("@playwright/test").Page) {
     .getByLabel("Email address", { exact: true })
     .fill("new-profile@example.com");
   await page
-    .getByRole("button", { name: "Send verification code", exact: true })
+    .getByRole("button", { name: "Email me a sign-in link", exact: true })
     .click();
   await page.getByLabel("Verification code", { exact: true }).fill("123456");
   await page

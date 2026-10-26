@@ -1,16 +1,18 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your Connect IRL verification code</title></head>
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in to Connect IRL</title></head>
   <body style="margin:0;background:#f3f7f3;color:#102b1d;font-family:Arial,sans-serif">
-    <div style="display:none;max-height:0;overflow:hidden">Your one-time Connect IRL sign-in code. Never share this code.</div>
+    <div style="display:none;max-height:0;overflow:hidden">Your one-time Connect IRL sign-in link. Never share it.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:32px 16px"><tr><td align="center">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#ffffff;border:1px solid #dfe8e1;border-radius:18px;overflow:hidden">
         <tr><td style="padding:28px 32px;background:#08271f;color:#eef9f1;font-size:25px;font-weight:bold">Connect <span style="color:#a9f2c0">IRL</span></td></tr>
         <tr><td style="padding:32px">
           <h1 style="font-size:25px;line-height:1.3;margin:0 0 14px">Your next hello starts here.</h1>
-          <p style="font-size:15px;line-height:1.7;color:#52665a">Enter this verification code in the app to confirm your email and sign in.</p>
-          <div style="padding:24px 12px;margin:24px 0;background:#edf8f0;border:1px solid #cfe5d5;border-radius:12px;text-align:center;font-size:36px;font-weight:bold;letter-spacing:8px;color:#123b28">{{ .Token }}</div>
-          <p style="font-size:13px;line-height:1.8;color:#52665a">This code is for one-time use. Never share it. If you didn’t request it, you can ignore this email.</p>
+          <p style="font-size:15px;line-height:1.7;color:#52665a">Tap the button to confirm your email and sign in. Open it in the same browser where you asked for the link.</p>
+          <p style="margin:24px 0"><a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 28px;background:#123b28;color:#ffffff;text-decoration:none;border-radius:10px;font-size:16px;font-weight:bold">Sign in to Connect IRL</a></p>
+          <p style="font-size:14px;line-height:1.7;color:#52665a">On another device or the button doesn’t open? Enter this code in the app instead:</p>
+          <div style="padding:20px 12px;margin:14px 0 24px;background:#edf8f0;border:1px solid #cfe5d5;border-radius:12px;text-align:center;font-size:32px;font-weight:bold;letter-spacing:8px;color:#123b28">{{ .Token }}</div>
+          <p style="font-size:13px;line-height:1.8;color:#52665a">The link and code are for one-time use. Never share them. If you didn’t request this, you can ignore this email.</p>
           <p style="margin:24px 0 0;font-size:13px;color:#52665a">Meet in real life. Keep the connection.</p>
         </td></tr>
       </table>
