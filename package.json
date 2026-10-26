@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "db:bundle": "node scripts/build-setup-sql.mjs",
     "email:assets": "node scripts/build-email-assets.mjs",
     "email:templates": "vitest run tests/unit/email-templates.test.ts -u",
     "test:e2e": "playwright test",

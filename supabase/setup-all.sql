@@ -1,6 +1,7 @@
 -- Connect IRL: one-paste database setup for a new Supabase project.
 -- Paste into Supabase -> SQL Editor -> New query -> Run. Run ONCE on an empty project.
--- This is migrations 001-008 followed by seed.sql, in order. If you add a migration, append it here.
+-- This is every migration in supabase/migrations (202610250001 to 202610260008) followed by seed.sql, in order.
+-- Regenerate with `npm run db:bundle` instead of editing it by hand.
 
 -- ============================================================
 -- supabase/migrations/202610250001_foundation.sql
@@ -684,7 +685,7 @@ end $$;
 -- supabase/migrations/202610260008_multi_event.sql
 -- ============================================================
 -- Attending several events: the private list of events a user is attending, alongside the current one.
-create or replace function public.sync_workspace(payload jsonb) returns jsonb language plpgsql security invoker set search_path = '' as $
+create or replace function public.sync_workspace(payload jsonb) returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare actor uuid := auth.uid(); item jsonb; meeting jsonb; p jsonb; person uuid; tag_value text;
 canonical_id uuid; original_id uuid; prior jsonb; merged_meetings jsonb; contact_ids jsonb := '{}'::jsonb; begin
   if actor is null then raise exception 'Unauthorized' using errcode='42501'; end if;
@@ -758,7 +759,7 @@ canonical_id uuid; original_id uuid; prior jsonb; merged_meetings jsonb; contact
     insert into public.blocked_users(owner_id,blocked_id) select actor,id from public.profiles where id::text in(select jsonb_array_elements_text(coalesce(payload->'blocked','[]'))) and id<>actor on conflict do nothing;
   end if;
   return contact_ids;
-end $;
+end $$;
 revoke all on function public.sync_workspace(jsonb) from public, anon;
 grant execute on function public.sync_workspace(jsonb) to authenticated;
 
@@ -778,4 +779,3 @@ insert into public.event_venues(event_id,name,address,city,longitude,latitude) v
 ('solana-2026','JW Marriott Mumbai Sahar','IA Project Road, Andheri East, Mumbai 400099','Mumbai',72.8781,19.1035),
 ('ethglobal-2026','Jio World Convention Centre','G Block, Bandra Kurla Complex, Bandra East, Mumbai 400051','Mumbai',72.8790,19.0636)
 on conflict(event_id) do update set name=excluded.name,address=excluded.address,longitude=excluded.longitude,latitude=excluded.latitude;
-
