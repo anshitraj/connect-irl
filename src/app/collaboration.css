@@ -1,0 +1,226 @@
+.app-sidebar {
+  overflow-y: auto;
+}
+.collaboration-loading {
+  padding: 32px 0;
+  color: #52655a;
+}
+.collaboration-list,
+.collaboration-teams {
+  display: grid;
+  gap: 16px;
+}
+.collaboration-card {
+  padding: 24px;
+}
+.collaboration-identity {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.collaboration-identity > div {
+  flex: 1;
+  min-width: 0;
+}
+.collaboration-identity strong,
+.team-identity a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.collaboration-identity span:not(.tag):not(.avatar) {
+  display: block;
+  color: #52655a;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.collaboration-identity p {
+  margin: 6px 0 0;
+  color: #52655a;
+  font-size: 12px;
+}
+.collaboration-message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+  color: #344c3e;
+  margin: 22px 0;
+  max-width: 850px;
+}
+.collaboration-footnote,
+.collaboration-team-note {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #52655a;
+}
+.collaboration-footnote {
+  margin: 24px 0 0;
+}
+.collaboration-team {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.collaboration-team > div {
+  flex: 1;
+}
+.collaboration-team h2 {
+  font-size: 19px;
+  margin: 0 0 6px;
+}
+.collaboration-team p {
+  color: #52655a;
+  margin: 0 0 12px;
+}
+.collaboration-team .tag + .tag {
+  margin-left: 6px;
+}
+.project-team-panel {
+  margin-top: 24px;
+  padding: 24px;
+}
+.project-team-panel .panel-heading {
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.project-team-panel .panel-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.project-team-panel h2 {
+  font-size: 18px;
+}
+.team-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+}
+.team-identity span {
+  display: block;
+  color: #52655a;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.team-member {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 18px;
+}
+.team-member > .team-identity {
+  flex: 1;
+}
+.team-inbox-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 18px;
+  min-height: 44px;
+}
+.member-role-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.member-role-form input {
+  width: 160px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px;
+  min-height: 44px;
+}
+.member-role-form .form-error {
+  width: 100%;
+}
+.team-member .small-tool {
+  min-height: 44px;
+}
+.venue-discovery {
+  margin-top: 28px;
+}
+.presence-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.presence-heading h2 {
+  font-size: clamp(22px, 2.5vw, 29px);
+  letter-spacing: -0.7px;
+  margin: 9px 0;
+}
+.presence-heading p {
+  color: #52655a;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 620px;
+}
+.presence-heading > .button {
+  flex-shrink: 0;
+}
+.presence-event-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.presence-event-label select {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  max-width: 100%;
+  color: var(--forest);
+}
+.presence-expires {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #52655a;
+  margin: 18px 0;
+}
+.presence-builder .builder-looking {
+  margin-top: 18px;
+}
+@media (max-width: 760px) {
+  .collaboration-card,
+  .collaboration-team,
+  .project-team-panel {
+    padding: 18px;
+  }
+  .team-member {
+    flex-wrap: wrap;
+  }
+  .team-member > .team-identity {
+    flex-basis: 100%;
+  }
+  .presence-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .presence-filters .app-search {
+    flex-basis: 100%;
+  }
+  .collaboration-identity {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .collaboration-identity > div {
+    min-width: 150px;
+  }
+  .collaboration-identity > .tag {
+    margin-left: 50px;
+  }
+}

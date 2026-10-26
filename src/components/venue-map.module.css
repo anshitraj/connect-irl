@@ -1,0 +1,57 @@
+.footer {
+  background: #fff;
+  border-top: 1px solid #dfe8e1;
+  padding: 10px 14px 12px;
+}
+.credits :global(.maplibregl-ctrl-attrib) {
+  float: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: #435b4b;
+  font-family: var(--font-geist), sans-serif;
+  font-size: 12px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.credits :global(.maplibregl-ctrl-attrib) a {
+  color: #265d40;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.frame .caption {
+  position: static;
+  display: block;
+  max-width: none;
+  margin: 7px 0 0;
+  padding: 0;
+  background: transparent;
+  color: #52665a;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.frame :global(.maplibregl-ctrl-group) {
+  border: 1px solid #d9e4dc;
+  border-radius: 11px;
+  box-shadow: 0 3px 12px #133e2314;
+  overflow: hidden;
+}
+.frame :global(.maplibregl-ctrl-group) button {
+  width: 40px;
+  height: 40px;
+}
+.frame :global(.maplibregl-ctrl-group) button:focus-visible {
+  outline: 2px solid #087744;
+  outline-offset: -3px;
+}
+.frame :global(.venue-marker) {
+  font-family: var(--font-geist), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (pointer: coarse) {
+  .frame :global(.maplibregl-ctrl-group) button {
+    width: 44px;
+    height: 44px;
+  }
+}

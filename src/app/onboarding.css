@@ -1,0 +1,338 @@
+.streamlined-onboarding .page-heading {
+  scroll-margin-top: 84px;
+}
+.streamlined-onboarding .setup-section + .setup-section {
+  margin-top: 24px;
+}
+.multi-role-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 12px;
+}
+.multi-role-picker button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  min-height: 44px;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+.multi-role-picker button.active {
+  animation: role-select 200ms var(--ease-out-craft);
+}
+.field-hint {
+  display: block;
+  font-weight: 400;
+  color: #52665a;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.selected-role-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #52665a;
+  background: #f3f8f2;
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.selected-role-summary svg {
+  flex-shrink: 0;
+  color: #117343;
+}
+.setup-social-photo {
+  scroll-margin-top: 84px;
+  padding: 20px 22px;
+  background: var(--irl-night);
+  color: var(--irl-fg);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-radius: 17px;
+}
+.setup-social-photo strong {
+  display: block;
+  font-size: 19px;
+  letter-spacing: -0.5px;
+}
+.setup-social-photo > div:last-child,
+.company-preview > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.setup-social-photo small {
+  display: block;
+  color: var(--irl-muted);
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.setup-social-photo > div:last-child > span {
+  display: block;
+  color: var(--irl-lime);
+  font-size: 12px;
+  margin-top: 6px;
+}
+.social-photo-avatar {
+  position: relative;
+  padding: 5px;
+  flex-shrink: 0;
+}
+.social-photo-avatar .avatar {
+  width: 74px;
+  height: 74px;
+  border: 2px solid #fff;
+  font-size: 27px;
+}
+.photo-loading-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #a9f2c035;
+  border-top-color: var(--irl-lime);
+  border-radius: 50%;
+  animation: photo-rotate 900ms linear infinite;
+}
+.photo-lookup-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: -10px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #52665a;
+}
+.photo-lookup-message svg {
+  flex-shrink: 0;
+}
+.photo-lookup-message button {
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: #087744;
+  min-height: 32px;
+}
+.social-input-label small {
+  margin-left: auto;
+  color: #52665a;
+  font-size: 11px;
+  font-weight: 400;
+}
+.setup-company {
+  padding: 22px;
+  border: 1px solid #d5e6d9;
+  border-radius: 16px;
+  background: #f7fbf6;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: setup-step-in 200ms var(--ease-out-craft);
+}
+.company-heading {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+}
+.company-heading > svg {
+  margin-top: 3px;
+  color: #1c7145;
+}
+.company-heading h3 {
+  font-size: 18px;
+  letter-spacing: -0.4px;
+}
+.company-heading p {
+  color: #52665a;
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.company-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-width: 0;
+}
+.company-preview .avatar,
+.public-company-card > .avatar {
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.company-preview strong {
+  display: block;
+  font-size: 15px;
+}
+.company-preview small {
+  display: block;
+  font-size: 11px;
+  margin-top: 5px;
+  color: #52665a;
+}
+.setup-event-step .setup-event-logos {
+  gap: 12px;
+}
+.setup-event-step .setup-event-logos > button {
+  min-height: 152px;
+  gap: 12px;
+}
+.setup-event-step .setup-event-logos > button small {
+  color: #52665a;
+  font-size: 10px;
+}
+.skip-event {
+  align-self: flex-start;
+  font-size: 12px;
+}
+.skip-event[aria-pressed="true"] {
+  background: #e7f7ed;
+  color: #126744;
+}
+.setup-actions {
+  justify-content: flex-end;
+}
+.setup-actions > .button:first-child:not(:only-child) {
+  margin-right: auto;
+}
+.public-company-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid #d5e6d9;
+  background: #f3f9f3;
+  padding: 20px;
+  border-radius: 14px;
+  margin-top: 24px;
+}
+.public-company-card h3 {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  margin-top: 8px;
+}
+.public-company-card p {
+  color: #52665a;
+  font-size: 13px;
+  margin-top: 7px;
+}
+.public-company-card .social-links {
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.profile-role-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+.builder-card-top > .profile-role-tags {
+  justify-content: flex-end;
+  max-width: 72%;
+  margin-top: 0;
+}
+.builder-card .profile-role-tags .tag {
+  font-size: 10px;
+  white-space: normal;
+}
+@keyframes role-select {
+  0% {
+    transform: scale(0.96);
+  }
+  65% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes photo-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 760px) {
+  .streamlined-onboarding .simple-profile-form {
+    padding: 22px 18px;
+  }
+  .multi-role-picker {
+    gap: 8px;
+  }
+  .multi-role-picker button {
+    font-size: 12px;
+    padding: 10px 11px;
+  }
+  .setup-social-photo {
+    padding: 16px;
+    gap: 12px;
+  }
+  .setup-social-photo strong {
+    font-size: 17px;
+  }
+  .social-photo-avatar .avatar {
+    width: 62px;
+    height: 62px;
+    font-size: 23px;
+  }
+  .setup-company {
+    padding: 16px;
+  }
+  .setup-company .form-row {
+    grid-template-columns: 1fr;
+  }
+  .setup-event-step .setup-event-logos {
+    grid-template-columns: 1fr;
+  }
+  .setup-event-step .setup-event-logos > button {
+    flex-direction: row;
+    justify-content: flex-start;
+    min-height: 88px;
+    gap: 14px;
+    padding: 15px;
+    flex-wrap: wrap;
+  }
+  .setup-event-step .setup-event-logos .event-logo {
+    width: 85px;
+    height: 43px;
+  }
+  .setup-event-step .setup-event-logos > button > span:last-of-type {
+    font-size: 13px;
+  }
+  .setup-event-step .setup-event-logos > button small {
+    font-size: 9px;
+    margin-left: 99px;
+    margin-top: -18px;
+  }
+  .setup-actions {
+    position: sticky;
+    bottom: 88px;
+    background: #fffffff2;
+    border: 1px solid #e1e9e3;
+    border-radius: 12px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+    z-index: 4;
+  }
+  .setup-actions .button {
+    min-height: 46px;
+  }
+  .public-company-card {
+    padding: 16px;
+    gap: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .multi-role-picker button.active,
+  .photo-loading-ring,
+  .setup-company {
+    animation: none;
+  }
+}

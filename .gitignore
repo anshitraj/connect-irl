@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+.env*
+!.env.example
+playwright-report/
+test-results/
+test-results-production/
+test-results-accessibility-check/
+test-results-map-regression/
+test-results-auth/
+test-results-success-check/
+*.tsbuildinfo
+lint-results.json
+public/vendor/maplibre-gl-worker.mjs
+public/vendor/maplibre-LICENSE.txt

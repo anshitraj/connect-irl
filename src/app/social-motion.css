@@ -1,0 +1,390 @@
+.platform-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.platform-logo img {
+  object-fit: contain;
+  display: block;
+}
+.social-input-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.social-input-label .platform-logo {
+  width: 28px;
+  height: 28px;
+  background: #f1f5f1;
+  border: 1px solid #e3ebe4;
+  border-radius: 8px;
+  transition:
+    transform 180ms var(--ease-out-craft),
+    background 180ms ease;
+}
+.social-input-label .platform-discord {
+  width: 92px;
+  background: #5865f2;
+  padding: 4px;
+}
+.setup-socials label:focus-within .platform-logo {
+  transform: rotate(-4deg) translateY(-2px);
+  background: #e4f8ed;
+}
+.setup-socials label:focus-within .platform-discord {
+  background: #5865f2;
+}
+.social-links a .platform-logo {
+  width: 20px;
+  height: 20px;
+  transition: transform 180ms var(--ease-out-craft);
+}
+.social-links .platform-discord {
+  overflow: hidden;
+  justify-content: flex-start;
+  background: #5865f2;
+  border-radius: 5px;
+}
+.social-links .platform-discord img {
+  width: 123px;
+  max-width: none;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.picker-event-logo {
+  width: 60px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 5px;
+  background: #efedf9;
+}
+.picker-event-logo.event-logo-ibw {
+  background: #232222;
+  padding: 6px;
+}
+.picker-event-logo.event-logo-solana {
+  background: #fff0df;
+}
+.setup-intro {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  background: linear-gradient(125deg, #e9f8ee, #f8faf7 75%);
+  border: 1px solid #deece2;
+  border-radius: 22px;
+}
+.setup-intro p {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.65px;
+  margin: 8px 0 9px;
+  line-height: 1.35;
+}
+.setup-intro small {
+  font-size: 12px;
+  color: #52665a;
+  line-height: 1.7;
+  display: block;
+}
+.connection-spark {
+  width: 164px;
+  height: 134px;
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.spark-orbit {
+  position: absolute;
+  width: 102px;
+  height: 102px;
+  border: 1px dashed #7bbd962e;
+  border-radius: 50%;
+}
+.spark-orbit.orbit-outer {
+  width: 142px;
+  height: 142px;
+  border-style: solid;
+  border-color: #7bbd9626;
+}
+.spark-you {
+  padding: 7px;
+  border: 1px solid #b6dfc7;
+  border-radius: 22px;
+  background: white;
+  box-shadow: 0 7px 18px #164b2910;
+  rotate: -5deg;
+  z-index: 2;
+}
+.spark-you .avatar {
+  border-radius: 16px;
+}
+.spark-node {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  background: white;
+  border: 1px solid #d8e6dc;
+  border-radius: 11px;
+  box-shadow: 0 5px 10px #164b2908;
+  animation: hello-bob 1.8s ease-in-out 2;
+}
+.node-github {
+  left: 1px;
+  top: 21px;
+  rotate: -10deg;
+}
+.node-linkedin {
+  right: 0;
+  top: 9px;
+  rotate: 8deg;
+  animation-delay: 0.12s;
+}
+.node-x {
+  left: 12px;
+  bottom: 0;
+  rotate: 7deg;
+  animation-delay: 0.24s;
+}
+.node-qr {
+  right: 4px;
+  bottom: 6px;
+  color: var(--forest);
+  rotate: -9deg;
+  animation-delay: 0.36s;
+}
+.spark-star {
+  position: absolute;
+  right: 37px;
+  top: -3px;
+  color: #13834f;
+  font-size: 21px;
+}
+.setup-event-logos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.setup-event-logos > button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #dce6de;
+  background: #fff;
+  border-radius: 13px;
+  padding: 16px 10px;
+  min-height: 113px;
+  transition:
+    transform 180ms var(--ease-out-craft),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.setup-event-logos > button.selected {
+  border-color: #148653;
+  box-shadow: 0 0 0 2px #14865316;
+  background: #f6fcf8;
+}
+.setup-event-logos .event-logo {
+  width: 112px;
+  max-width: 100%;
+  height: 48px;
+}
+.setup-event-logos .event-logo-ibw {
+  background: #232222;
+  border-radius: 7px;
+  padding: 9px;
+}
+.setup-event-logos > button > span:last-of-type {
+  font-size: 11px;
+  font-weight: 550;
+  color: #364e3f;
+}
+.setup-event-logos > button > svg {
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  color: #087341;
+}
+.setup-step {
+  animation: setup-step-in 220ms var(--ease-out-craft);
+}
+.setup-progress .active b {
+  animation: step-pop 260ms var(--ease-out-craft);
+}
+.scan-saved-check {
+  position: relative;
+  animation: step-pop 380ms var(--ease-out-craft);
+}
+.connection-celebration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.connection-celebration i {
+  position: absolute;
+  left: calc(50% - 3px);
+  top: calc(50% - 3px);
+  height: 7px;
+  width: 5px;
+  background: #20be78;
+  border-radius: 2px;
+  rotate: calc(var(--piece) * 45deg);
+  animation: hello-confetti 900ms var(--ease-out-craft) both;
+}
+.connection-celebration i:nth-child(2n) {
+  background: #d6b45d;
+  border-radius: 50%;
+}
+.connection-celebration i:nth-child(3n) {
+  background: #94c4db;
+}
+.scan-saved .scan-meeting-context {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  border: 1px solid #e0ece3;
+  border-radius: 10px;
+  background: #f4faf5;
+  font-size: 12px;
+  padding: 8px 14px;
+}
+@keyframes hello-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+@keyframes setup-step-in {
+  from {
+    translate: 8px 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes step-pop {
+  0% {
+    scale: 0.88;
+  }
+  65% {
+    scale: 1.08;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes hello-confetti {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-70px) rotate(70deg);
+    opacity: 0;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .social-links a:hover .platform-logo {
+    transform: translateY(-2px) rotate(-4deg);
+  }
+  .setup-event-logos button:hover {
+    transform: translateY(-2px);
+    border-color: #8abd9e;
+  }
+}
+@media (max-width: 760px) {
+  .setup-intro {
+    padding: 16px;
+    gap: 12px;
+  }
+  .connection-spark {
+    width: 116px;
+    height: 128px;
+  }
+  .spark-orbit.orbit-outer {
+    width: 116px;
+    height: 116px;
+  }
+  .spark-node {
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+  }
+  .node-github {
+    left: -5px;
+    top: 14px;
+  }
+  .node-linkedin {
+    right: -3px;
+    top: 4px;
+  }
+  .node-x {
+    left: 0;
+    bottom: 0;
+  }
+  .node-qr {
+    right: -1px;
+    bottom: 5px;
+  }
+  .spark-you .avatar {
+    width: 43px;
+    height: 43px;
+    font-size: 18px;
+  }
+  .setup-intro p {
+    font-size: 17px;
+  }
+  .setup-intro small {
+    font-size: 11px;
+  }
+  .setup-intro .app-eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.8px;
+  }
+  .setup-event-logos > button {
+    padding: 14px 7px;
+    min-height: 100px;
+  }
+  .setup-event-logos .event-logo {
+    width: 85px;
+    height: 40px;
+  }
+  .setup-event-logos > button > span:last-of-type {
+    font-size: 10px;
+  }
+  .current-event-picker select {
+    max-width: calc(100vw - 130px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spark-node,
+  .setup-step,
+  .setup-progress .active b,
+  .scan-saved-check,
+  .connection-celebration i {
+    animation: none;
+  }
+  .connection-celebration {
+    display: none;
+  }
+}
