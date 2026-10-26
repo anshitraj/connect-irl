@@ -10,6 +10,7 @@ import "./connectirl.css";
 import "./onboarding.css";
 import "./onboarding-flow.css";
 import "./contact-cards.css";
+import "./settings-layout.css";
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",

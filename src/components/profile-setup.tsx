@@ -365,6 +365,28 @@ function ProfileSetupForm() {
       setError(err instanceof Error ? err.message : "Check your details.");
     }
   };
+  const uploadPhoto = async (file?: File) => {
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const response = await fetch("/api/avatar", { method: "POST", body });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+      setForm((current) => ({
+        ...current,
+        avatar: result.url,
+        avatarSource: "upload",
+      }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Photo could not upload.");
+    } finally {
+      setUploading(false);
+      if (upload.current) upload.current.value = "";
+    }
+  };
   const photoStatus = (
     <div className="photo-lookup-message" role="status">
       {xPhoto.status === "loading" ? (
@@ -575,6 +597,32 @@ function ProfileSetupForm() {
           Use X photo instead
         </Button>
       )}
+      {!existing && (
+        <div className="onb-upload">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!user || demo || uploading}
+            onClick={() => upload.current?.click()}
+          >
+            <Upload size={14} />
+            {uploading
+              ? "Uploading…"
+              : form.avatarSource === "upload"
+                ? "Choose a different photo"
+                : "Upload your own photo"}
+          </Button>
+          {!user && <small>Sign in to upload a photo.</small>}
+          <input
+            ref={upload}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            aria-label="Upload avatar"
+            onChange={(e) => void uploadPhoto(e.target.files?.[0])}
+          />
+        </div>
+      )}
       {socialInput("LinkedIn")}
       {(developer || existing) && socialInput("GitHub")}
       {(founder || (existing && existing.company)) && companySection}
@@ -709,33 +757,7 @@ function ProfileSetupForm() {
           accept="image/jpeg,image/png,image/webp"
           className="sr-only"
           aria-label="Upload avatar"
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            setUploading(true);
-            setError("");
-            try {
-              const body = new FormData();
-              body.append("file", file);
-              const response = await fetch("/api/avatar", {
-                method: "POST",
-                body,
-              });
-              const result = await response.json();
-              if (!response.ok) throw new Error(result.error);
-              setForm((current) => ({
-                ...current,
-                avatar: result.url,
-                avatarSource: "upload",
-              }));
-            } catch (err) {
-              setError(
-                err instanceof Error ? err.message : "Photo could not upload.",
-              );
-            } finally {
-              setUploading(false);
-            }
-          }}
+          onChange={(e) => void uploadPhoto(e.target.files?.[0])}
         />
       </div>
       <label>

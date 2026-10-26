@@ -18,6 +18,7 @@ import {
   ScanLine,
   Settings,
   ShieldCheck,
+  TriangleAlert,
   UserRound,
   Users,
   WifiOff,
@@ -26,6 +27,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { accountPhoto } from "@/lib/account";
 import { ShareQR } from "./qr";
 import { ConnectionActivity } from "./connection-activity";
 import { Avatar, Brand, Button, ButtonLink } from "./ui";
@@ -235,10 +237,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Settings
           </Link>
           <Link href="/app/profile" className="sidebar-user">
-            <Avatar
+            <ProfileAvatar
               name={data.profile?.name || "You"}
-              src={data.profile?.avatar}
-              size="sm"
+              photo={data.profile?.avatar}
+              fallback={accountPhoto(user)}
             />
             <span>
               <strong>
@@ -332,11 +334,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               {pending > 0 && <span className="notification-dot" />}
             </Link>
             {user ? (
-              <Link href="/app/profile">
-                <Avatar
+              <Link href="/app/profile" aria-label="My profile">
+                <ProfileAvatar
                   name={data.profile?.name || "You"}
-                  src={data.profile?.avatar}
-                  size="sm"
+                  photo={data.profile?.avatar}
+                  fallback={accountPhoto(user)}
                 />
               </Link>
             ) : (
@@ -368,6 +370,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Use my workspace
               <X size={13} />
             </button>
+          </div>
+        )}
+        {onboarding === "needed" && !demo && (
+          <div className="workspace-banner onboarding-banner" role="status">
+            <span>
+              <span className="warning-label">
+                <TriangleAlert size={12} />
+                Action needed
+              </span>
+              Complete your onboarding so people can scan your QR and save you.
+            </span>
+            <Link href="/app/profile">
+              Complete onboarding
+              <ChevronRight size={13} />
+            </Link>
           </div>
         )}
         {syncStatus === "error" && (
@@ -436,6 +453,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         />
       )}
     </div>
+  );
+}
+// Prefer the profile photo, fall back to the Google/X account photo, then initials.
+function ProfileAvatar({
+  name,
+  photo,
+  fallback,
+}: {
+  name: string;
+  photo?: string;
+  fallback: string;
+}) {
+  const [failed, setFailed] = useState<string[]>([]);
+  const src = [photo, fallback].find(
+    (candidate) => candidate && !failed.includes(candidate),
+  );
+  return (
+    <Avatar
+      name={name}
+      src={src}
+      size="sm"
+      onImageError={() => src && setFailed((list) => [...list, src])}
+    />
   );
 }
 function ArrowIcon() {
