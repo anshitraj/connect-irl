@@ -11,6 +11,7 @@ const SHELLS = new Set([
   "/app/events",
   "/app/map",
   "/app/follow-ups",
+  "/app/nearby",
   "/app/profile",
   "/app/settings",
 ]);

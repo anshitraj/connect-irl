@@ -52,6 +52,10 @@ const FollowUps = dynamic(
   () => import("./follow-ups").then((m) => m.FollowUps),
   { loading },
 );
+const NearbyNow = dynamic(
+  () => import("./nearby").then((m) => m.NearbyNow),
+  { loading },
+);
 const CollaborationInbox = dynamic(
   () => import("./collaboration").then((m) => m.CollaborationInbox),
   { loading },
@@ -95,6 +99,8 @@ function WorkspaceScreen({ path }: { path: string[] }) {
         <EventsDirectory />
       );
     }
+    case "nearby":
+      return <NearbyNow />;
     case "map":
       return <EventsDirectory mapFirst />;
     case "follow-ups":

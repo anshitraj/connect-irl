@@ -4,7 +4,15 @@ import { writeFile } from "node:fs/promises";
 test("primary surfaces have no automated WCAG A/AA violations", async ({
   page,
 }) => {
-  for (const route of ["/", "/app", "/app/profile", "/app/scan", "/login"]) {
+  for (const route of [
+    "/",
+    "/app",
+    "/app/profile",
+    "/app/scan",
+    "/app/nearby",
+    "/app/settings",
+    "/login",
+  ]) {
     await page.goto(route);
     await expect(page.locator("main")).toBeVisible();
     if (route === "/") {

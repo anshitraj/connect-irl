@@ -15,6 +15,7 @@ import {
   Map,
   Menu,
   QrCode,
+  Radar,
   ScanLine,
   Settings,
   ShieldCheck,
@@ -36,6 +37,7 @@ import { EventPicker } from "./event-picker";
 const navigation = [
   { href: "/app", label: "Home", icon: Home },
   { href: "/app/scan", label: "Scan & connect", icon: ScanLine },
+  { href: "/app/nearby", label: "Nearby now", icon: Radar },
   { href: "/app/people", label: "My people", icon: Users },
   { href: "/app/discover", label: "Discover", icon: Compass },
   { href: "/app/projects", label: "Projects", icon: Box },
@@ -429,7 +431,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           { href: "/app", label: "Home", icon: Home },
           { href: "/app/people", label: "People", icon: Users },
           { href: "/app/scan", label: "Scan", icon: ScanLine },
-          { href: "/app/discover", label: "Discover", icon: Compass },
+          { href: "/app/nearby", label: "Nearby", icon: Radar },
           { href: "/app/profile", label: "Profile", icon: UserRound },
         ].map((n) => (
           <Link

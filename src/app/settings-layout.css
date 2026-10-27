@@ -1,135 +1,28 @@
-/* Settings: a section list on the left (chips on phones) and one section at a time. */
-.set-layout {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
-  gap: 28px;
-  align-items: start;
-  max-width: 1040px;
+/* Settings as a compact grouped list, the way phone settings look. */
+.set-page {
+  max-width: 680px;
 }
-.set-nav {
-  position: sticky;
-  top: 96px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.set-page .page-heading {
+  margin-bottom: 18px;
 }
-.set-nav button {
+.set-account {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 9px 12px;
-  border: 0;
-  border-radius: 12px;
-  background: none;
-  color: #3a5446;
-  text-align: left;
-  transition: background 150ms ease;
-}
-.set-nav button span {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.set-nav button strong {
-  font-size: 14px;
-  font-weight: 600;
-  color: #10261b;
-}
-.set-nav button small {
-  font-size: 12px;
-  color: #587063;
-}
-.set-nav button:hover {
-  background: #eef6f0;
-}
-.set-nav button.active {
-  background: #e1f2e7;
-  color: #0b5a37;
-}
-.set-content {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  min-width: 0;
-}
-.set-group {
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 16px 18px;
   border: 1px solid #dce8df;
   border-radius: 18px;
   background: #fff;
-  overflow: hidden;
-}
-.set-group-head {
-  padding: 18px 22px 4px;
-}
-.set-group-head h2 {
-  font-size: 16px;
-  letter-spacing: -0.2px;
-  color: #10261b;
-}
-.set-group-head p {
-  margin-top: 4px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #52665a;
-}
-.set-rows {
-  display: flex;
-  flex-direction: column;
-}
-.set-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 16px 22px;
-}
-.set-row + .set-row {
-  border-top: 1px solid #edf3ee;
-}
-.set-row > div:first-child {
-  min-width: 0;
-}
-.set-row strong {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #10261b;
-}
-.set-row p {
-  margin-top: 4px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #52665a;
-  overflow-wrap: anywhere;
-}
-.set-row-action {
-  flex: none;
-}
-.set-row-action .button {
-  min-height: 40px;
-  font-size: 13px;
-  white-space: nowrap;
-}
-.set-account {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 22px;
-}
-.set-account {
-  flex-wrap: wrap;
 }
 .set-account > div {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  gap: 4px;
-  min-width: 200px;
+  gap: 3px;
+  min-width: 0;
 }
 .set-account strong {
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: -0.3px;
   color: #10261b;
 }
@@ -138,77 +31,129 @@
   color: #52665a;
   overflow-wrap: anywhere;
 }
-.set-account .button {
-  flex: none;
-  min-height: 40px;
-  font-size: 13px;
+.set-group {
+  margin-bottom: 22px;
 }
-.set-danger {
-  border-color: #f0cdc8;
+.set-group h2 {
+  margin: 0 0 8px 16px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #587063;
 }
-.set-danger .set-group-head h2 {
-  color: #9e342d;
+.set-list {
+  border: 1px solid #dce8df;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
 }
-.set-legal,
-.set-hint {
+.set-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #52665a;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 16px;
+  border: 0;
+  background: none;
+  color: #10261b;
+  font-size: 15px;
+  text-align: left;
 }
-.set-legal a {
+.set-item + .set-item {
+  border-top: 1px solid #edf3ee;
+}
+button.set-item,
+a.set-item {
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+button.set-item:hover,
+a.set-item:hover {
+  background: #f4f9f5;
+}
+.set-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #e8f5ec;
   color: #0b5a37;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
-@media (max-width: 860px) {
-  .set-layout {
-    grid-template-columns: 1fr;
-    gap: 16px;
+.set-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+.set-value {
+  max-width: 45%;
+  overflow: hidden;
+  font-size: 14px;
+  color: #587063;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.set-chevron {
+  flex: none;
+  color: #8aa192;
+}
+.set-item-danger,
+.set-item-danger .set-label {
+  color: #b23a32;
+}
+.set-item-danger .set-icon {
+  background: #fdecea;
+  color: #b23a32;
+}
+.set-switch {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: #c9d6cd;
+  transition: background 160ms ease;
+}
+.set-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px #0003;
+  transition: transform 160ms var(--ease-out-craft);
+}
+.set-switch[aria-checked="true"] {
+  background: #0b7a47;
+}
+.set-switch[aria-checked="true"] span {
+  transform: translateX(18px);
+}
+.set-footnote {
+  margin: 4px 16px 0;
+  font-size: 12px;
+  color: #587063;
+}
+@media (max-width: 560px) {
+  .set-item {
+    min-height: 52px;
+    font-size: 15px;
   }
-  .set-nav {
-    position: static;
-    flex-direction: row;
-    gap: 8px;
-    margin: 0 -4px;
-    padding: 0 4px 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  .set-value {
+    max-width: 40%;
+    font-size: 13px;
   }
-  .set-nav button {
-    flex: none;
-    min-height: 42px;
-    padding: 8px 14px;
-    border: 1px solid #dce8df;
-    border-radius: 99px;
-    background: #fff;
-  }
-  .set-nav button small {
-    display: none;
-  }
-  .set-nav button.active {
-    border-color: #0b5a37;
-  }
-  .set-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 16px 18px;
-  }
-  .set-row-action .button {
-    width: 100%;
-    justify-content: center;
-  }
-  .set-group-head {
-    padding: 16px 18px 2px;
-  }
-  .set-account {
-    flex-wrap: wrap;
-    padding: 18px;
-  }
-  .set-account .button {
-    width: 100%;
-    justify-content: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .set-switch,
+  .set-switch span {
+    transition: none;
   }
 }

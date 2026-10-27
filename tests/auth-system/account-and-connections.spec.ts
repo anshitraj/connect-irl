@@ -94,6 +94,24 @@ test("the other account receives a genuine synced connection and success animati
     }),
   ).toBeVisible();
   await expect(page.getByText("PRIVATE meeting context")).toHaveCount(0);
+  // Scan once, both connected: the person who was scanned saves the scanner back.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const key = Object.keys(localStorage).find((key) =>
+            /^buildermatch\.user\..+\.v1$/.test(key),
+          )!;
+          return JSON.parse(localStorage.getItem(key)!).contacts.map(
+            (contact: { name: string }) => contact.name,
+          );
+        }),
+      { timeout: 20000 },
+    )
+    .toEqual(["Asha Rao"]);
+  await expect(
+    page.getByText("They’re saved to your people too. Your notes stay private."),
+  ).toBeVisible();
   const accessibility = await new AxeBuilder({ page })
     .include(".incoming-success")
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])

@@ -1,8 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Bell, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Bell, Check, RefreshCw, UserPlus } from "lucide-react";
 import { z } from "zod";
-import { Avatar, Button, ButtonLink, Modal } from "./ui";
+import {
+  rememberSavedBack,
+  savedBackReceipts,
+  useAutoSaveBack,
+} from "@/lib/preferences";
+import { contactFromProfile } from "@/lib/utils";
+import { profileSchema } from "@/lib/validation";
+import { Avatar, Button, ButtonLink, Modal, Tag } from "./ui";
 import { ConnectionBridge } from "./connection-success";
 import { useWorkspace } from "./workspace-provider";
 const receiptSchema = z.object({
@@ -23,7 +30,8 @@ export function ConnectionActivity() {
   return user && !demo ? <ConnectionInbox key={user.id} /> : null;
 }
 function ConnectionInbox() {
-  const { online, toast } = useWorkspace();
+  const { online, toast, user, data, saveContact } = useWorkspace();
+  const autoSave = useAutoSaveBack(user?.id);
   const [open, setOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -32,6 +40,48 @@ function ConnectionInbox() {
   const [refresh, setRefresh] = useState(0);
   const seen = useRef(new Set<string>());
   const since = useRef(0);
+  const saving = useRef(new Set<string>());
+  const latest = useRef({ data, saveContact, autoSave, account: user?.id });
+  useEffect(() => {
+    latest.current = { data, saveContact, autoSave, account: user?.id };
+  });
+  const saved = (item: Receipt) =>
+    data.contacts.some((contact) => contact.profileId === item.actor.id);
+  // Scan once, both connected: save the person who scanned you to your people.
+  const saveBack = useCallback(
+    async (item: Receipt, automatic: boolean) => {
+      const { data, saveContact, account } = latest.current;
+      if (!account || saving.current.has(item.id)) return;
+      if (
+        data.blocked.includes(item.actor.id) ||
+        data.contacts.some((contact) => contact.profileId === item.actor.id)
+      ) {
+        rememberSavedBack(account, item.id);
+        return;
+      }
+      saving.current.add(item.id);
+      try {
+        const response = await fetch(
+          `/api/profiles/${encodeURIComponent(item.actor.username)}`,
+          { cache: "no-store" },
+        );
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        const profile = profileSchema.parse(result.profile);
+        rememberSavedBack(account, item.id);
+        saveContact(contactFromProfile(profile));
+        if (automatic)
+          toast(
+            `${profile.name.split(" ")[0]} connected with you. Saved to your people.`,
+          );
+      } catch {
+        if (!automatic) toast("Couldn’t save them right now. Try again.");
+      } finally {
+        saving.current.delete(item.id);
+      }
+    },
+    [toast],
+  );
   useEffect(() => {
     const changed = (event: Event) =>
       setSharing(Boolean((event as CustomEvent).detail));
@@ -69,6 +119,12 @@ function ConnectionInbox() {
         setReceipts(items);
         setError("");
         if (arrival && sharing) setCelebrate(arrival);
+        const { autoSave, account } = latest.current;
+        if (autoSave && account) {
+          const done = savedBackReceipts(account);
+          for (const item of items)
+            if (!done.includes(item.id)) void saveBack(item, true);
+        }
       } catch (err) {
         if (!disposed && !controller.signal.aborted)
           setError(
@@ -95,7 +151,7 @@ function ConnectionInbox() {
       window.removeEventListener("focus", focused);
       document.removeEventListener("visibilitychange", focused);
     };
-  }, [online, sharing, open, refresh]);
+  }, [online, sharing, open, refresh, saveBack]);
   const read = async (item: Receipt) => {
     if (item.readAt) return;
     try {
@@ -160,6 +216,16 @@ function ConnectionInbox() {
                   <p>Connected with you</p>
                   <small>{new Date(item.createdAt).toLocaleString()}</small>
                 </div>
+                {saved(item) ? (
+                  <Tag color="green">
+                    <Check size={11} /> Saved
+                  </Tag>
+                ) : (
+                  <Button variant="secondary" onClick={() => void saveBack(item, false)}>
+                    <UserPlus size={14} />
+                    Save back
+                  </Button>
+                )}
                 <ButtonLink href={`/u/${item.actor.username}`} variant="ghost">
                   View profile
                 </ButtonLink>
@@ -193,12 +259,20 @@ function ConnectionInbox() {
             <ConnectionBridge person={celebrate.actor} incoming />
             <h3>{celebrate.actor.name} connected with you.</h3>
             <p>
-              Your notes stay private. You can save their profile if you’d like
-              to connect back.
+              {saved(celebrate)
+                ? "They’re saved to your people too. Your notes stay private."
+                : "Your notes stay private. Save them back to connect both ways."}
             </p>
-            <ButtonLink href={`/u/${celebrate.actor.username}`}>
-              View their profile
-            </ButtonLink>
+            {saved(celebrate) ? (
+              <ButtonLink href={`/u/${celebrate.actor.username}`}>
+                View their profile
+              </ButtonLink>
+            ) : (
+              <Button onClick={() => void saveBack(celebrate, false)}>
+                <UserPlus size={15} />
+                Save back
+              </Button>
+            )}
           </div>
         )}
       </Modal>
